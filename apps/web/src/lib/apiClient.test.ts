@@ -51,9 +51,7 @@ describe('streamSse', () => {
     ];
     mockFetch(frames);
 
-    const events = await collect(
-      streamSse<QueryEvent>('/api/query', {}, QueryEventSchema),
-    );
+    const events = await collect(streamSse<QueryEvent>('/api/query', {}, QueryEventSchema));
 
     expect(events).toHaveLength(3);
     expect(events[0]).toEqual({ type: 'token', value: 'Hello ' });
@@ -67,9 +65,7 @@ describe('streamSse', () => {
     const mid = Math.floor(full.length / 2);
     mockFetch([full.slice(0, 5), full.slice(5, mid), full.slice(mid)]);
 
-    const events = await collect(
-      streamSse<QueryEvent>('/api/query', {}, QueryEventSchema),
-    );
+    const events = await collect(streamSse<QueryEvent>('/api/query', {}, QueryEventSchema));
 
     expect(events).toEqual([{ type: 'token', value: 'split' }]);
   });
@@ -80,24 +76,20 @@ describe('streamSse', () => {
       `data: ${JSON.stringify({ type: 'token', value: 'tail' })}`, // no trailing \n\n
     ]);
 
-    const events = await collect(
-      streamSse<QueryEvent>('/api/query', {}, QueryEventSchema),
-    );
+    const events = await collect(streamSse<QueryEvent>('/api/query', {}, QueryEventSchema));
 
     expect(events).toEqual([{ type: 'token', value: 'tail' }]);
   });
 
   it('rejects when the response is not ok', async () => {
     mockFetch([], false, 500);
-    await expect(
-      collect(streamSse('/api/query', {}, QueryEventSchema)),
-    ).rejects.toThrow(/failed \(500\)/);
+    await expect(collect(streamSse('/api/query', {}, QueryEventSchema))).rejects.toThrow(
+      /failed \(500\)/,
+    );
   });
 
   it('throws on a payload that violates the schema', async () => {
     mockFetch([`data: ${JSON.stringify({ type: 'nope' })}\n\n`]);
-    await expect(
-      collect(streamSse('/api/query', {}, QueryEventSchema)),
-    ).rejects.toThrow();
+    await expect(collect(streamSse('/api/query', {}, QueryEventSchema))).rejects.toThrow();
   });
 });

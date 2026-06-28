@@ -142,10 +142,7 @@ export const useGraphStore = defineStore('graph', () => {
    * Merge newly-discovered entities/relations (e.g. from a query's `graph`
    * event) into the canvas without dropping what's already there.
    */
-  function mergeGraph(
-    newEntities: Entity[],
-    newRelations: Relation[],
-  ): void {
+  function mergeGraph(newEntities: Entity[], newRelations: Relation[]): void {
     const entityMap = new Map(graph.value.entities.map((e) => [e.id, e]));
     for (const e of newEntities) entityMap.set(e.id, e);
     const relationMap = new Map(graph.value.relations.map((r) => [r.id, r]));

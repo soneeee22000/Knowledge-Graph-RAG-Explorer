@@ -22,10 +22,7 @@ const saliencePct = computed(() => Math.round(entity.value.salience * 100));
 <template>
   <div
     class="entity-node group relative flex h-full w-full select-none flex-col items-center justify-center rounded-full border-2 px-3 text-center backdrop-blur-sm transition-all duration-300 ease-out"
-    :class="[
-      highlighted ? 'is-highlighted' : '',
-      selected ? 'ring-2 ring-white/70' : '',
-    ]"
+    :class="[highlighted ? 'is-highlighted' : '', selected ? 'ring-2 ring-white/70' : '']"
     :style="{
       borderColor: visual.color,
       background: visual.fill,
@@ -34,11 +31,7 @@ const saliencePct = computed(() => Math.round(entity.value.salience * 100));
         : '0 6px 18px rgba(0,0,0,0.45)',
     }"
   >
-    <Handle
-      type="target"
-      :position="Position.Top"
-      class="!h-2 !w-2 !border-0 !bg-transparent"
-    />
+    <Handle type="target" :position="Position.Top" class="!h-2 !w-2 !border-0 !bg-transparent" />
     <span
       class="pointer-events-none text-base leading-none opacity-90"
       :style="{ color: visual.color }"
@@ -62,11 +55,7 @@ const saliencePct = computed(() => Math.round(entity.value.salience * 100));
     >
       salience {{ saliencePct }}%
     </span>
-    <Handle
-      type="source"
-      :position="Position.Bottom"
-      class="!h-2 !w-2 !border-0 !bg-transparent"
-    />
+    <Handle type="source" :position="Position.Bottom" class="!h-2 !w-2 !border-0 !bg-transparent" />
   </div>
 </template>
 

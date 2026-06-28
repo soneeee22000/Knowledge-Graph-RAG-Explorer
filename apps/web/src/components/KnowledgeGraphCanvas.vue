@@ -13,8 +13,7 @@ import type { GraphNode } from '@/stores/graph';
 import type { EntityType } from '@kg/shared';
 
 const graphStore = useGraphStore();
-const { nodes, edges, isEmpty, entityCount, relationCount, revision } =
-  storeToRefs(graphStore);
+const { nodes, edges, isEmpty, entityCount, relationCount, revision } = storeToRefs(graphStore);
 
 const { fitView, onNodeClick, onPaneClick } = useVueFlow();
 
@@ -71,9 +70,7 @@ const legend = (
       class="pointer-events-none absolute left-0 right-0 top-0 z-10 flex items-center justify-between px-5 py-4"
     >
       <div class="pointer-events-auto">
-        <h2 class="text-sm font-semibold tracking-wide text-slate-200">
-          Knowledge Graph
-        </h2>
+        <h2 class="text-sm font-semibold tracking-wide text-slate-200">Knowledge Graph</h2>
         <p class="text-xs text-slate-500">
           {{ entityCount }} entities · {{ relationCount }} relations
         </p>
@@ -99,12 +96,7 @@ const legend = (
       fit-view-on-init
       class="h-full w-full"
     >
-      <Background
-        :variant="BackgroundVariant.Dots"
-        :gap="26"
-        :size="1"
-        pattern-color="#1d2436"
-      />
+      <Background :variant="BackgroundVariant.Dots" :gap="26" :size="1" pattern-color="#1d2436" />
       <Controls position="bottom-right" :show-interactive="false" />
       <MiniMap
         :node-color="minimapColor"
@@ -119,11 +111,7 @@ const legend = (
     <div
       class="pointer-events-none absolute bottom-4 left-4 z-10 flex max-w-[60%] flex-wrap gap-x-3 gap-y-1.5 rounded-xl border border-[#232838] bg-[#0c0e16]/80 px-3 py-2 text-[10px] text-slate-400 backdrop-blur"
     >
-      <span
-        v-for="item in legend"
-        :key="item.type"
-        class="flex items-center gap-1.5"
-      >
+      <span v-for="item in legend" :key="item.type" class="flex items-center gap-1.5">
         <span
           class="inline-block h-2.5 w-2.5 rounded-full"
           :style="{ backgroundColor: item.color }"
@@ -144,8 +132,8 @@ const legend = (
       </div>
       <p class="text-sm font-medium text-slate-300">No graph yet</p>
       <p class="max-w-xs text-xs leading-relaxed text-slate-500">
-        Ingest a document on the left — extracted entities and their relations
-        will materialize here as an interactive knowledge graph.
+        Ingest a document on the left — extracted entities and their relations will materialize here
+        as an interactive knowledge graph.
       </p>
     </div>
   </section>

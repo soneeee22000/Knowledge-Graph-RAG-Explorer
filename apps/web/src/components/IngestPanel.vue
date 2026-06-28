@@ -14,9 +14,7 @@ const content = ref('');
 const confirmingReset = ref(false);
 
 const charCount = computed(() => content.value.length);
-const canIngest = computed(
-  () => !ingesting.value && content.value.trim().length > 0,
-);
+const canIngest = computed(() => !ingesting.value && content.value.trim().length > 0);
 
 const PHASE_LABELS: Record<IngestPhase, string> = {
   chunking: 'Chunking',
@@ -116,17 +114,10 @@ function formatDate(iso: string): string {
 
     <!-- Live progress -->
     <Transition name="fade">
-      <div
-        v-if="progress"
-        class="rounded-xl border border-[#232838] bg-[#11131c] p-3"
-      >
+      <div v-if="progress" class="rounded-xl border border-[#232838] bg-[#11131c] p-3">
         <div class="mb-2 flex items-center justify-between">
-          <span class="text-xs font-medium text-slate-300">{{
-            progress.message
-          }}</span>
-          <span class="text-[10px] text-slate-500"
-            >{{ Math.round(progress.ratio * 100) }}%</span
-          >
+          <span class="text-xs font-medium text-slate-300">{{ progress.message }}</span>
+          <span class="text-[10px] text-slate-500">{{ Math.round(progress.ratio * 100) }}%</span>
         </div>
         <div class="h-1.5 w-full overflow-hidden rounded-full bg-[#1d2233]">
           <div
@@ -135,11 +126,7 @@ function formatDate(iso: string): string {
           />
         </div>
         <ol class="mt-2.5 flex justify-between">
-          <li
-            v-for="(phase, i) in phases"
-            :key="phase"
-            class="flex flex-col items-center gap-1"
-          >
+          <li v-for="(phase, i) in phases" :key="phase" class="flex flex-col items-center gap-1">
             <span
               class="h-2 w-2 rounded-full transition-colors"
               :class="
@@ -166,8 +153,7 @@ function formatDate(iso: string): string {
         class="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-300"
       >
         ✓ Extracted {{ lastResult.entityCount }} entities and
-        {{ lastResult.relationCount }} relations from
-        {{ lastResult.chunkCount }} chunks.
+        {{ lastResult.relationCount }} relations from {{ lastResult.chunkCount }} chunks.
       </p>
     </Transition>
 

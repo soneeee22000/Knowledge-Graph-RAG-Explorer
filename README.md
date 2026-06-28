@@ -137,13 +137,21 @@ Optional — seed via the API instead of the UI:
 node scripts/seed.mjs
 ```
 
-### Use real LLMs (via BAML)
+### Use real LLMs (via BAML + Mastra)
 
 ```bash
 export ANTHROPIC_API_KEY=...        # or OPENAI_API_KEY / MISTRAL_API_KEY
 npm run baml:generate               # generate the typed BAML client
 LLM_PROVIDER=baml npm run dev:api
 ```
+
+With a key, extraction and answering run the real BAML functions
+(`ExtractKnowledgeGraph`, `AnswerQuestion`) with Claude → GPT-4o → Mistral
+fallback, and the Mastra agent binds a real model and genuinely calls
+`agent.generate(...)` to plan. Offline, the identical
+plan → retrieve → graph-expand → rerank → synthesize flow runs deterministically.
+Embeddings always use a local deterministic embedder (swap in a real embedding
+model for production).
 
 ### Docker
 

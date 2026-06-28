@@ -76,16 +76,11 @@ onMounted(check);
           <template v-else-if="state === 'checking'">Checking…</template>
           <template v-else>Backend offline</template>
         </p>
-        <p
-          v-if="health"
-          class="text-[10px] text-slate-500"
-        >
+        <p v-if="health" class="text-[10px] text-slate-500">
           {{ health.llmProvider }} · {{ health.documentCount }} docs ·
           {{ health.entityCount }} entities
         </p>
-        <p v-else-if="state === 'offline'" class="text-[10px] text-slate-600">
-          retry
-        </p>
+        <p v-else-if="state === 'offline'" class="text-[10px] text-slate-600">retry</p>
       </div>
     </button>
   </header>

@@ -8,10 +8,10 @@ code.
 
 ## Functions
 
-| Function | Input | Output | Purpose |
-| --- | --- | --- | --- |
-| `ExtractKnowledgeGraph` | `chunk: string` | `GraphExtraction` | Pull entities + typed relations from a text chunk |
-| `AnswerQuestion` | `question, context` | `GroundedAnswer` | Answer strictly from retrieved context, naming entities used |
+| Function                | Input               | Output            | Purpose                                                      |
+| ----------------------- | ------------------- | ----------------- | ------------------------------------------------------------ |
+| `ExtractKnowledgeGraph` | `chunk: string`     | `GraphExtraction` | Pull entities + typed relations from a text chunk            |
+| `AnswerQuestion`        | `question, context` | `GroundedAnswer`  | Answer strictly from retrieved context, naming entities used |
 
 ## Clients
 

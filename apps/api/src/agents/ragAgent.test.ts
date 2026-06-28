@@ -28,12 +28,9 @@ describe('runRagQuery integration', () => {
 
   it('ingests a doc then answers with citations and a done event', async () => {
     const ingestEvents: IngestEvent[] = [];
-    await stores.corpus.ingest(
-      { title: 'Mastra Overview', source: 'test', content: DOC },
-      (e) => {
-        ingestEvents.push(e);
-      },
-    );
+    await stores.corpus.ingest({ title: 'Mastra Overview', source: 'test', content: DOC }, (e) => {
+      ingestEvents.push(e);
+    });
     expect(ingestEvents.some((e) => e.type === 'complete')).toBe(true);
     expect(stores.vectorStore.size).toBeGreaterThan(0);
     expect(stores.graphStore.entityCount).toBeGreaterThan(0);

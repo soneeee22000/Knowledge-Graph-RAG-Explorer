@@ -48,7 +48,12 @@ export class Corpus {
     const now = new Date().toISOString();
 
     // 1. Chunking ---------------------------------------------------------
-    await emit({ type: 'progress', phase: 'chunking', message: 'Splitting document into chunks', ratio: 0 });
+    await emit({
+      type: 'progress',
+      phase: 'chunking',
+      message: 'Splitting document into chunks',
+      ratio: 0,
+    });
     const texts = chunkText(req.content);
     const chunks: Chunk[] = texts.map((text, index) => ({
       id: `chunk_${documentId}_${index}`,
@@ -72,12 +77,25 @@ export class Corpus {
     await emit({ type: 'progress', phase: 'embedding', message: 'Embedding chunks', ratio: 0.2 });
     const embeddings = await this.provider.embed(chunks.map((c) => c.text));
     this.vectorStore.add(
-      chunks.map((chunk, i) => ({ chunk: { ...chunk, embedding: embeddings[i] }, embedding: embeddings[i]! })),
+      chunks.map((chunk, i) => ({
+        chunk: { ...chunk, embedding: embeddings[i] },
+        embedding: embeddings[i]!,
+      })),
     );
-    await emit({ type: 'progress', phase: 'embedding', message: 'Embeddings computed', ratio: 0.45 });
+    await emit({
+      type: 'progress',
+      phase: 'embedding',
+      message: 'Embeddings computed',
+      ratio: 0.45,
+    });
 
     // 3. Extraction + 4. Linking -----------------------------------------
-    await emit({ type: 'progress', phase: 'extracting', message: 'Extracting entities & relations', ratio: 0.5 });
+    await emit({
+      type: 'progress',
+      phase: 'extracting',
+      message: 'Extracting entities & relations',
+      ratio: 0.5,
+    });
     const entitiesBefore = this.graphStore.entityCount;
     const relationsBefore = this.graphStore.relationCount;
 
@@ -94,7 +112,12 @@ export class Corpus {
       });
     }
 
-    await emit({ type: 'progress', phase: 'linking', message: 'Linking & scoring graph', ratio: 0.85 });
+    await emit({
+      type: 'progress',
+      phase: 'linking',
+      message: 'Linking & scoring graph',
+      ratio: 0.85,
+    });
     // mergeExtraction already recomputes salience; one final pass for safety.
     this.graphStore.recomputeSalience();
 
@@ -102,7 +125,12 @@ export class Corpus {
     const relationCount = this.graphStore.relationCount - relationsBefore;
 
     // 5. Persisting -------------------------------------------------------
-    await emit({ type: 'progress', phase: 'persisting', message: 'Persisting stores', ratio: 0.95 });
+    await emit({
+      type: 'progress',
+      phase: 'persisting',
+      message: 'Persisting stores',
+      ratio: 0.95,
+    });
     const document: Document = {
       id: documentId,
       title: req.title,

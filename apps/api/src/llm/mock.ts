@@ -57,10 +57,19 @@ const STOPWORDS = new Set([
 
 /** Keyword hints that bias an entity's type classification. */
 const TYPE_HINTS: Array<{ test: RegExp; type: EntityType }> = [
-  { test: /\b(inc|corp|llc|ltd|gmbh|sa|company|labs?|ai|systems|technologies)\b/i, type: 'organization' },
-  { test: /\b(university|institute|foundation|agency|council|commission)\b/i, type: 'organization' },
+  {
+    test: /\b(inc|corp|llc|ltd|gmbh|sa|company|labs?|ai|systems|technologies)\b/i,
+    type: 'organization',
+  },
+  {
+    test: /\b(university|institute|foundation|agency|council|commission)\b/i,
+    type: 'organization',
+  },
   { test: /\b(city|country|region|valley|river|mountain|street|state)\b/i, type: 'location' },
-  { test: /\b(protocol|framework|engine|model|algorithm|platform|api|sdk|library|database)\b/i, type: 'technology' },
+  {
+    test: /\b(protocol|framework|engine|model|algorithm|platform|api|sdk|library|database)\b/i,
+    type: 'technology',
+  },
   { test: /\b(product|app|application|tool|device)\b/i, type: 'product' },
   { test: /\b(summit|conference|war|election|launch|release|event)\b/i, type: 'event' },
 ];

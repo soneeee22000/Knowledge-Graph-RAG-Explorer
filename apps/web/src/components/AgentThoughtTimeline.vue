@@ -34,10 +34,7 @@ function durationLabel(step: ThoughtStep): string {
     <h3
       class="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500"
     >
-      <span
-        v-if="active"
-        class="h-1.5 w-1.5 animate-pulse rounded-full bg-indigo-400"
-      />
+      <span v-if="active" class="h-1.5 w-1.5 animate-pulse rounded-full bg-indigo-400" />
       Agent thought process
     </h3>
 
@@ -45,32 +42,20 @@ function durationLabel(step: ThoughtStep): string {
       v-if="ordered.length === 0"
       class="rounded-lg border border-dashed border-[#232838] px-3 py-6 text-center text-xs text-slate-600"
     >
-      The agent's reasoning will stream here as it plans, retrieves, expands the
-      graph, and synthesizes an answer.
+      The agent's reasoning will stream here as it plans, retrieves, expands the graph, and
+      synthesizes an answer.
     </div>
 
-    <TransitionGroup
-      v-else
-      tag="ol"
-      name="step"
-      class="relative space-y-3 pl-1"
-    >
-      <li
-        v-for="(step, i) in ordered"
-        :key="step.id"
-        class="relative flex gap-3"
-      >
+    <TransitionGroup v-else tag="ol" name="step" class="relative space-y-3 pl-1">
+      <li v-for="(step, i) in ordered" :key="step.id" class="relative flex gap-3">
         <!-- Connector line + node -->
         <div class="relative flex flex-col items-center">
           <span
             class="z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-xs transition-colors"
             :class="{
-              'border-indigo-500/60 bg-indigo-500/15 text-indigo-300':
-                step.status === 'running',
-              'border-emerald-500/50 bg-emerald-500/15 text-emerald-300':
-                step.status === 'done',
-              'border-red-500/50 bg-red-500/15 text-red-300':
-                step.status === 'error',
+              'border-indigo-500/60 bg-indigo-500/15 text-indigo-300': step.status === 'running',
+              'border-emerald-500/50 bg-emerald-500/15 text-emerald-300': step.status === 'done',
+              'border-red-500/50 bg-red-500/15 text-red-300': step.status === 'error',
             }"
           >
             <span
@@ -89,22 +74,15 @@ function durationLabel(step: ThoughtStep): string {
         <!-- Content -->
         <div class="flex-1 pb-1">
           <div class="flex items-center gap-2">
-            <span class="text-xs" aria-hidden="true">{{
-              meta(step.phase).icon
-            }}</span>
-            <span class="text-sm font-medium text-slate-200">{{
-              step.title
-            }}</span>
+            <span class="text-xs" aria-hidden="true">{{ meta(step.phase).icon }}</span>
+            <span class="text-sm font-medium text-slate-200">{{ step.title }}</span>
             <span
               v-if="durationLabel(step)"
               class="ml-auto text-[10px] tabular-nums text-slate-600"
               >{{ durationLabel(step) }}</span
             >
           </div>
-          <p
-            v-if="step.detail"
-            class="mt-0.5 text-xs leading-relaxed text-slate-500"
-          >
+          <p v-if="step.detail" class="mt-0.5 text-xs leading-relaxed text-slate-500">
             {{ step.detail }}
           </p>
           <span

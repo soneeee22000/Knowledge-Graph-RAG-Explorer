@@ -17,9 +17,7 @@ const emit = defineEmits<{
 
 const graphStore = useGraphStore();
 
-const hasContent = computed(
-  () => props.text.length > 0 || props.citations.length > 0,
-);
+const hasContent = computed(() => props.text.length > 0 || props.citations.length > 0);
 
 /** Resolve an entity id to a human label if it's present in the graph. */
 function entityLabel(id: string): string {
@@ -68,9 +66,7 @@ function onCitation(citation: Citation): void {
 
     <!-- Used entities -->
     <div v-if="usedEntityIds.length > 0" class="mt-3">
-      <p class="mb-1.5 text-[10px] uppercase tracking-wide text-slate-600">
-        Entities traversed
-      </p>
+      <p class="mb-1.5 text-[10px] uppercase tracking-wide text-slate-600">Entities traversed</p>
       <div class="flex flex-wrap gap-1.5">
         <button
           v-for="id in usedEntityIds"

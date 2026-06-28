@@ -6,8 +6,7 @@ import AgentThoughtTimeline from '@/components/AgentThoughtTimeline.vue';
 import AnswerCard from '@/components/AnswerCard.vue';
 
 const chat = useChatStore();
-const { messages, topK, useGraphExpansion, running, isEmpty } =
-  storeToRefs(chat);
+const { messages, topK, useGraphExpansion, running, isEmpty } = storeToRefs(chat);
 
 const question = ref('');
 const scrollRegion = ref<HTMLElement | null>(null);
@@ -55,19 +54,12 @@ watch(
   <aside
     class="flex h-full flex-col overflow-hidden rounded-2xl border border-[#232838] bg-[#0c0e16]/60"
   >
-    <header
-      class="flex items-center justify-between border-b border-[#232838] px-4 py-3"
-    >
+    <header class="flex items-center justify-between border-b border-[#232838] px-4 py-3">
       <div>
-        <h2 class="text-sm font-semibold tracking-wide text-slate-200">
-          Ask the graph
-        </h2>
+        <h2 class="text-sm font-semibold tracking-wide text-slate-200">Ask the graph</h2>
         <p class="text-xs text-slate-500">Agentic graph-RAG over your corpus</p>
       </div>
-      <span
-        v-if="running"
-        class="flex items-center gap-1.5 text-[11px] text-indigo-300"
-      >
+      <span v-if="running" class="flex items-center gap-1.5 text-[11px] text-indigo-300">
         <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-indigo-400" />
         thinking
       </span>
@@ -85,12 +77,10 @@ watch(
           ✶
         </div>
         <div>
-          <p class="text-sm font-medium text-slate-300">
-            Ask a question to begin
-          </p>
+          <p class="text-sm font-medium text-slate-300">Ask a question to begin</p>
           <p class="mt-1 max-w-xs text-xs leading-relaxed text-slate-500">
-            The agent will plan, retrieve grounded chunks, expand along graph
-            relations, and synthesize a cited answer — live.
+            The agent will plan, retrieve grounded chunks, expand along graph relations, and
+            synthesize a cited answer — live.
           </p>
         </div>
         <div class="flex flex-col gap-1.5">
@@ -119,10 +109,7 @@ watch(
 
           <!-- Assistant turn -->
           <div v-else class="space-y-3">
-            <AgentThoughtTimeline
-              :steps="msg.thoughts"
-              :active="msg.streaming"
-            />
+            <AgentThoughtTimeline :steps="msg.thoughts" :active="msg.streaming" />
             <AnswerCard
               :text="msg.text"
               :citations="msg.citations"
@@ -152,11 +139,7 @@ watch(
           <span class="w-5 tabular-nums text-slate-400">{{ topK }}</span>
         </label>
         <label class="flex cursor-pointer items-center gap-1.5 text-[11px] text-slate-500">
-          <input
-            v-model="useGraphExpansion"
-            type="checkbox"
-            class="accent-indigo-500"
-          />
+          <input v-model="useGraphExpansion" type="checkbox" class="accent-indigo-500" />
           graph expansion
         </label>
       </div>

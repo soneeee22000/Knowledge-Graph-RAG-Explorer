@@ -12,7 +12,7 @@ grounded answer — streaming every reasoning step over SSE.
 - Node.js >= 20, TypeScript (strict), ESM only.
 - [Fastify](https://fastify.dev) for HTTP + SSE, `@fastify/cors`.
 - [Mastra](https://mastra.ai) (`@mastra/core`) — the RAG `Agent` + `createTool` tools.
-- [graphology](https://graphology.github.io) (+ `graphology-metrics`) for the knowledge graph.
+- [graphology](https://graphology.github.io) for the knowledge graph (degree-centrality salience).
 - [zod](https://zod.dev) for validation (shapes imported from `@kg/shared`).
 - Dev `tsx`, build `tsup`, test `vitest`.
 
@@ -37,15 +37,15 @@ npm run test       # vitest run
 
 Copy `.env.example` → `.env` (all values have defaults; the app boots without any).
 
-| Var                 | Default     | Description                                         |
-| ------------------- | ----------- | --------------------------------------------------- |
-| `PORT`              | `8000`      | HTTP port.                                          |
-| `HOST`              | `0.0.0.0`   | Bind host.                                           |
-| `LLM_PROVIDER`      | `mock`      | `mock` (offline) or `baml` (needs keys + client).   |
-| `DATA_DIR`          | `./data`    | Where `vectors.json`, `graph.json`, `documents.json` are persisted. |
-| `CORS_ORIGIN`       | `*`         | Comma-separated origins, or `*`.                    |
-| `ANTHROPIC_API_KEY` | _(unset)_   | Only used by the `baml` provider.                   |
-| `OPENAI_API_KEY`    | _(unset)_   | Only used by the `baml` provider.                   |
+| Var                 | Default   | Description                                                                         |
+| ------------------- | --------- | ----------------------------------------------------------------------------------- |
+| `PORT`              | `8000`    | HTTP port.                                                                          |
+| `HOST`              | `0.0.0.0` | Bind host.                                                                          |
+| `LLM_PROVIDER`      | `mock`    | `mock` (offline) or `baml` (needs keys + client).                                   |
+| `DATA_DIR`          | `./data`  | Where `vectors.json`, `graph.json`, `documents.json` are persisted.                 |
+| `CORS_ORIGIN`       | `*`       | Comma-separated origins, or `*` (demo default; set explicit origins in production). |
+| `ANTHROPIC_API_KEY` | _(unset)_ | Only used by the `baml` provider.                                                   |
+| `OPENAI_API_KEY`    | _(unset)_ | Only used by the `baml` provider.                                                   |
 
 ## Provider abstraction
 
@@ -56,38 +56,48 @@ The pipeline is written against the `LlmProvider` interface
   Hash-based L2-normalized embeddings, heuristic capitalized-phrase + keyword
   entity extraction with co-occurrence relations, and extractive answers that
   stitch the most relevant context sentences.
-- **`BamlLlmProvider`** (`src/llm/baml.ts`) — dynamically `import()`s the
-  generated BAML client (`@kg/baml` / `packages/baml/baml_client`) at runtime
-  inside try/catch. If absent it throws a clear error asking you to run
-  `npm run baml:generate` and set keys. It is **never** statically imported, so
-  `tsc`/`tsup` stay green in a fresh checkout.
+- **`BamlLlmProvider`** (`src/llm/baml.ts`) — runs the real BAML functions
+  `ExtractKnowledgeGraph` and `AnswerQuestion` (see `packages/baml/baml_src`)
+  through the generated typed client with Claude → GPT-4o → Mistral fallback.
+  Embeddings aren't an LLM function, so it reuses the same local deterministic
+  embedder as the mock (swap in a real embedding model for production). The
+  generated client (`@kg/baml`) is dynamically `import()`ed at runtime inside
+  try/catch — never statically imported — so `tsc`/`tsup` stay green in a fresh
+  checkout; if it's missing it throws a clear error asking you to run
+  `npm run baml:generate`.
 
 Selected by `LLM_PROVIDER` via the factory in `src/llm/index.ts`.
 
-### Mastra usage & offline note
+### Mastra usage (keyed vs offline)
 
 `src/agents/ragAgent.ts` defines a real `@mastra/core` `Agent` named
 `kg-rag-explorer` with instructions describing the
-plan → retrieve → graph-expand → synthesize flow, and registers two real
-`createTool` tools (`src/agents/tools.ts`): `retrieve` and `graphExpand`.
+plan → retrieve → graph-expand → rerank → synthesize flow, and registers two real
+`createTool` tools (`src/agents/tools.ts`): `retrieve` and `graphExpand`. The
+tools' `execute` and the pipeline call the **same** shared functions
+(`retrieveContext`, `expandGraph`), so the tools are never decorative.
 
-Because `Agent.generate` normally needs a bound model, the offline pipeline
-driver `runRagQuery` executes the same tools/provider deterministically so the
-whole system works with the mock. No API key is required at import time.
+- **With a key** (`LLM_PROVIDER=baml` + `ANTHROPIC_API_KEY`): a real Anthropic
+  model is bound and `agent.generate(...)` is genuinely invoked to produce the
+  retrieval plan (the agent may autonomously call its tools), and synthesis runs
+  the real BAML `AnswerQuestion` function.
+- **Offline** (default mock): `runRagQuery` executes the identical
+  plan → retrieve → graph-expand → rerank → synthesize flow deterministically, so
+  the whole system works with zero keys. No API key is required at import time.
 
 ## API (prefix `/api`)
 
 All request/response/event shapes come from `@kg/shared` (the single source of
 truth). SSE frames are serialized with `toSseFrame`.
 
-| Method & path        | Body            | Response                                                            |
-| -------------------- | --------------- | ------------------------------------------------------------------ |
-| `GET /api/health`    | —               | `HealthResponse` `{status, llmProvider, documentCount, entityCount}` |
-| `GET /api/documents` | —               | `DocumentListResponse`                                             |
-| `GET /api/graph`     | —               | `KnowledgeGraph` (full current graph)                              |
-| `POST /api/ingest`   | `IngestRequest` | **SSE** stream of `IngestEvent` (progress…/complete or error)      |
+| Method & path        | Body            | Response                                                                   |
+| -------------------- | --------------- | -------------------------------------------------------------------------- |
+| `GET /api/health`    | —               | `HealthResponse` `{status, llmProvider, documentCount, entityCount}`       |
+| `GET /api/documents` | —               | `DocumentListResponse`                                                     |
+| `GET /api/graph`     | —               | `KnowledgeGraph` (full current graph)                                      |
+| `POST /api/ingest`   | `IngestRequest` | **SSE** stream of `IngestEvent` (progress…/complete or error)              |
 | `POST /api/query`    | `QueryRequest`  | **SSE** stream of `QueryEvent` (thought/retrieved/graph/token/answer/done) |
-| `DELETE /api/corpus` | —               | `204`; clears all stores + persisted JSON files                    |
+| `DELETE /api/corpus` | —               | `204`; clears all stores + persisted JSON files                            |
 
 SSE responses set `Content-Type: text/event-stream`, `Cache-Control: no-cache`,
 `Connection: keep-alive`, and flush per frame. Invalid bodies return `400` with
@@ -125,4 +135,7 @@ src/
 ```
 
 Persisted artifacts live in `DATA_DIR` and are gitignored at the repo root.
+
+```
+
 ```

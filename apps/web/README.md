@@ -21,7 +21,7 @@ types); SSE frames are validated against those schemas at the boundary.
 > The root maintainer installs dependencies (`npm install` at the repo root).
 
 ```bash
-npm run dev        # Vite dev server (default http://localhost:5173)
+npm run dev        # Vite dev server (http://localhost:3000)
 npm run build      # vue-tsc --noEmit && vite build
 npm run preview    # preview the production build
 npm run typecheck  # vue-tsc --noEmit

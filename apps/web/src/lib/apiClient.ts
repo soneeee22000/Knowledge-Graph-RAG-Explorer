@@ -17,9 +17,7 @@ import type {
 } from '@kg/shared';
 
 /** Base URL for the backend; configurable per-environment via Vite env. */
-export const API_URL = (
-  import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
-).replace(/\/$/, '');
+export const API_URL = (import.meta.env.VITE_API_URL ?? 'http://localhost:8000').replace(/\/$/, '');
 
 export class ApiError extends Error {
   constructor(
@@ -162,10 +160,7 @@ function parseSseRecord<T>(
   return schema.parse(json);
 }
 
-export function streamQuery(
-  body: QueryRequest,
-  signal?: AbortSignal,
-): AsyncGenerator<QueryEvent> {
+export function streamQuery(body: QueryRequest, signal?: AbortSignal): AsyncGenerator<QueryEvent> {
   return streamSse(`${API_URL}/api/query`, body, QueryEventSchema, signal);
 }
 

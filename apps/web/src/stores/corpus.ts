@@ -1,11 +1,7 @@
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 import type { Document, IngestPhase } from '@kg/shared';
-import {
-  getDocuments,
-  resetCorpus as apiResetCorpus,
-  streamIngest,
-} from '@/lib/apiClient';
+import { getDocuments, resetCorpus as apiResetCorpus, streamIngest } from '@/lib/apiClient';
 import { useGraphStore } from '@/stores/graph';
 
 export interface IngestProgress {
@@ -14,13 +10,7 @@ export interface IngestProgress {
   ratio: number;
 }
 
-const PHASE_ORDER: IngestPhase[] = [
-  'chunking',
-  'embedding',
-  'extracting',
-  'linking',
-  'persisting',
-];
+const PHASE_ORDER: IngestPhase[] = ['chunking', 'embedding', 'extracting', 'linking', 'persisting'];
 
 export const useCorpusStore = defineStore('corpus', () => {
   const documents = ref<Document[]>([]);
@@ -50,8 +40,7 @@ export const useCorpusStore = defineStore('corpus', () => {
       const res = await getDocuments();
       documents.value = res.documents;
     } catch (err) {
-      error.value =
-        err instanceof Error ? err.message : 'Failed to load documents';
+      error.value = err instanceof Error ? err.message : 'Failed to load documents';
     } finally {
       loading.value = false;
     }
@@ -112,8 +101,7 @@ export const useCorpusStore = defineStore('corpus', () => {
       // Pull fresh documents + the rebuilt graph after a successful ingest.
       await Promise.all([refresh(), graphStore.refresh()]);
     } catch (err) {
-      error.value =
-        err instanceof Error ? err.message : 'Ingestion stream failed';
+      error.value = err instanceof Error ? err.message : 'Ingestion stream failed';
     } finally {
       ingesting.value = false;
     }
@@ -128,8 +116,7 @@ export const useCorpusStore = defineStore('corpus', () => {
       lastResult.value = null;
       useGraphStore().clear();
     } catch (err) {
-      error.value =
-        err instanceof Error ? err.message : 'Failed to reset corpus';
+      error.value = err instanceof Error ? err.message : 'Failed to reset corpus';
     }
   }
 

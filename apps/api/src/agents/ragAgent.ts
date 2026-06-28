@@ -2,7 +2,6 @@ import { randomUUID } from 'node:crypto';
 import { Agent } from '@mastra/core/agent';
 import type {
   Answer,
-  Citation,
   Entity,
   QueryEvent,
   QueryRequest,
@@ -11,8 +10,9 @@ import type {
   ThoughtStatus,
   ThoughtStep,
 } from '@kg/shared';
+import { config } from '../config.js';
 import type { AppStores } from '../services/stores.js';
-import { createRagTools } from './tools.js';
+import { createRagTools, expandGraph, retrieveContext } from './tools.js';
 
 /** Async sink for streamed query events. */
 export type QueryEmit = (event: QueryEvent) => void | Promise<void>;
@@ -28,30 +28,33 @@ export type QueryEmit = (event: QueryEvent) => void | Promise<void>;
  *
  * No model is bound here, so importing this module never requires an API key.
  */
-export function createRagAgent(stores: AppStores): Agent {
+export function createRagAgent(stores: AppStores, model?: unknown): Agent {
   const { retrieveTool, graphExpandTool } = createRagTools(stores);
 
-  // `@mastra/core`'s `Agent` requires a bound model. Binding a *real* provider
-  // would need an API key at import and break offline operation, so we bind a
-  // placeholder AI SDK model that is never invoked: `runRagQuery` drives
-  // generation through the pluggable provider instead. In a keyed deployment
-  // you'd swap this for e.g. `openai('gpt-4o')` and call `agent.generate(...)`.
+  // `@mastra/core`'s `Agent` requires a bound model. Offline we bind a
+  // placeholder AI SDK model that is never invoked; with a real key (see
+  // `generateAgentPlan`) a genuine Anthropic model is passed in and
+  // `agent.generate(...)` is actually called.
   const offlineModel = {
     specificationVersion: 'v1',
     provider: 'kg-offline',
     modelId: 'offline-placeholder',
     defaultObjectGenerationMode: undefined,
     doGenerate: () => {
-      throw new Error('Offline placeholder model invoked — bind a real model to use agent.generate().');
+      throw new Error(
+        'Offline placeholder model invoked — bind a real model to use agent.generate().',
+      );
     },
     doStream: () => {
-      throw new Error('Offline placeholder model invoked — bind a real model to use agent.generate().');
+      throw new Error(
+        'Offline placeholder model invoked — bind a real model to use agent.generate().',
+      );
     },
   };
 
   const agentConfig = {
     name: 'kg-rag-explorer',
-    model: offlineModel,
+    model: model ?? offlineModel,
     instructions: [
       'You are a knowledge-graph-augmented RAG agent.',
       'Follow this flow for every question:',
@@ -65,6 +68,32 @@ export function createRagAgent(stores: AppStores): Agent {
   };
 
   return new Agent(agentConfig as unknown as ConstructorParameters<typeof Agent>[0]);
+}
+
+/**
+ * When a real key is configured (`LLM_PROVIDER=baml` + `ANTHROPIC_API_KEY`),
+ * bind a real Anthropic model and run a genuine Mastra `agent.generate()` to
+ * produce the retrieval plan — the agent may autonomously invoke its registered
+ * tools. Returns `null` offline so the deterministic pipeline supplies the plan,
+ * and on any failure so a model/SDK hiccup never breaks a query.
+ */
+async function generateAgentPlan(stores: AppStores, question: string): Promise<string | null> {
+  if (config.LLM_PROVIDER !== 'baml' || !process.env.ANTHROPIC_API_KEY) return null;
+  try {
+    const { anthropic } = await import('@ai-sdk/anthropic');
+    const agent = createRagAgent(stores, anthropic('claude-sonnet-4-6'));
+    const result = await agent.generate(
+      `State a brief retrieval plan (one or two sentences) for answering: "${question}"`,
+    );
+    const text = result.text?.trim();
+    return text && text.length > 0 ? text : null;
+  } catch (err) {
+    console.warn(
+      'Mastra agent.generate plan unavailable; using deterministic plan:',
+      err instanceof Error ? err.message : String(err),
+    );
+    return null;
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -138,27 +167,20 @@ export async function runRagQuery(
       );
     }
     const planStep = await beginStep(emit, 'plan', 'Planning retrieval');
+    const agentPlan = await generateAgentPlan(stores, req.question);
     await endStep(
       emit,
       planStep,
       'plan',
       'Planning retrieval',
-      `Agent "${agentName}" will retrieve top-${req.topK} chunks` +
-        `${req.useGraphExpansion ? ' and expand the knowledge graph' : ''}.`,
+      agentPlan ??
+        `Agent "${agentName}" will retrieve top-${req.topK} chunks` +
+          `${req.useGraphExpansion ? ' and expand the knowledge graph' : ''}.`,
     );
 
     // 2. RETRIEVE ---------------------------------------------------------
     const retrieveStep = await beginStep(emit, 'retrieve', 'Retrieving context');
-    const [queryEmbedding] = await stores.provider.embed([req.question]);
-    const hits = stores.vectorStore.search(queryEmbedding ?? [], req.topK);
-    const documents = new Map(stores.corpus.listDocuments().map((d) => [d.id, d]));
-    const citations: Citation[] = hits.map((hit) => ({
-      chunkId: hit.chunk.id,
-      documentId: hit.chunk.documentId,
-      documentTitle: documents.get(hit.chunk.documentId)?.title ?? hit.chunk.documentId,
-      snippet: hit.chunk.text.slice(0, 280),
-      score: hit.score,
-    }));
+    const citations = await retrieveContext(stores, req.question, req.topK);
     await emit({ type: 'retrieved', citations });
     await endStep(
       emit,
@@ -180,15 +202,9 @@ export async function runRagQuery(
         .filter((e) => e.sourceChunkIds.some((id) => retrievedChunkIds.has(id)))
         .map((e) => e.id);
 
-      const entityMap = new Map<string, Entity>();
-      const relationMap = new Map<string, Relation>();
-      for (const id of seedIds) {
-        const sub = stores.graphStore.neighbors(id, 1);
-        for (const e of sub.entities) entityMap.set(e.id, e);
-        for (const r of sub.relations) relationMap.set(r.id, r);
-      }
-      usedEntities.push(...entityMap.values());
-      usedRelations.push(...relationMap.values());
+      const expanded = expandGraph(stores, seedIds, 1);
+      usedEntities.push(...expanded.entities);
+      usedRelations.push(...expanded.relations);
 
       await emit({ type: 'graph', entities: usedEntities, relations: usedRelations });
       await endStep(
@@ -200,12 +216,39 @@ export async function runRagQuery(
       );
     }
 
-    // 4. SYNTHESIZE -------------------------------------------------------
+    // 4. RERANK (graph-aware) --------------------------------------------
+    // Boost chunks that contributed an entity surfaced during graph expansion,
+    // so graph-connected evidence floats to the top before synthesis.
+    let rankedCitations = citations;
+    if (req.useGraphExpansion && usedEntities.length > 0) {
+      const rerankStep = await beginStep(emit, 'rerank', 'Reranking by graph signal');
+      const GRAPH_BOOST = 0.15;
+      const boostedChunkIds = new Set(usedEntities.flatMap((e) => e.sourceChunkIds));
+      const boosted = (c: (typeof citations)[number]): number =>
+        c.score + (boostedChunkIds.has(c.chunkId) ? GRAPH_BOOST : 0);
+      rankedCitations = [...citations].sort((a, b) => boosted(b) - boosted(a));
+      const boostedCount = citations.filter((c) => boostedChunkIds.has(c.chunkId)).length;
+      await emit({ type: 'retrieved', citations: rankedCitations });
+      await endStep(
+        emit,
+        rerankStep,
+        'rerank',
+        'Reranking by graph signal',
+        `Boosted ${boostedCount} graph-connected chunk(s).`,
+      );
+    }
+
+    // 5. SYNTHESIZE -------------------------------------------------------
     const synthStep = await beginStep(emit, 'synthesize', 'Synthesizing answer');
-    const contextParts: string[] = citations.map((c) => c.snippet);
+    const contextParts: string[] = rankedCitations.map((c) => c.snippet);
     if (usedEntities.length > 0) {
       const entityLine =
-        'Key entities: ' + usedEntities.map((e) => e.label).slice(0, 12).join(', ') + '.';
+        'Key entities: ' +
+        usedEntities
+          .map((e) => e.label)
+          .slice(0, 12)
+          .join(', ') +
+        '.';
       contextParts.push(entityLine);
     }
     const context = contextParts.join('\n');
@@ -218,7 +261,7 @@ export async function runRagQuery(
 
     const answer: Answer = {
       text: answerText,
-      citations,
+      citations: rankedCitations,
       usedEntityIds: usedEntities.map((e) => e.id),
       usedRelationIds: usedRelations.map((r) => r.id),
     };

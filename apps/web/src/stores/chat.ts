@@ -92,14 +92,9 @@ export const useChatStore = defineStore('chat', () => {
           case 'graph': {
             graphStore.mergeGraph(event.entities, event.relations);
             const ids = event.entities.map((e) => e.id);
-            assistant.usedEntityIds = [
-              ...new Set([...assistant.usedEntityIds, ...ids]),
-            ];
+            assistant.usedEntityIds = [...new Set([...assistant.usedEntityIds, ...ids])];
             assistant.usedRelationIds = [
-              ...new Set([
-                ...assistant.usedRelationIds,
-                ...event.relations.map((r) => r.id),
-              ]),
+              ...new Set([...assistant.usedRelationIds, ...event.relations.map((r) => r.id)]),
             ];
             graphStore.highlight(assistant.usedEntityIds);
             break;
@@ -119,8 +114,7 @@ export const useChatStore = defineStore('chat', () => {
         }
       }
     } catch (err) {
-      assistant.error =
-        err instanceof Error ? err.message : 'Query stream failed';
+      assistant.error = err instanceof Error ? err.message : 'Query stream failed';
     } finally {
       assistant.streaming = false;
       running.value = false;
@@ -131,12 +125,8 @@ export const useChatStore = defineStore('chat', () => {
     // Prefer the authoritative final text; keep streamed text if final is empty.
     if (answer.text.length > 0) msg.text = answer.text;
     if (answer.citations.length > 0) msg.citations = answer.citations;
-    msg.usedEntityIds = [
-      ...new Set([...msg.usedEntityIds, ...answer.usedEntityIds]),
-    ];
-    msg.usedRelationIds = [
-      ...new Set([...msg.usedRelationIds, ...answer.usedRelationIds]),
-    ];
+    msg.usedEntityIds = [...new Set([...msg.usedEntityIds, ...answer.usedEntityIds])];
+    msg.usedRelationIds = [...new Set([...msg.usedRelationIds, ...answer.usedRelationIds])];
   }
 
   function clear(): void {

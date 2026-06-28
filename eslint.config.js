@@ -5,13 +5,7 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    ignores: [
-      '**/dist/**',
-      '**/node_modules/**',
-      '**/baml_client/**',
-      '**/*.d.ts',
-      'apps/web/**',
-    ],
+    ignores: ['**/dist/**', '**/node_modules/**', '**/baml_client/**', '**/*.d.ts', 'apps/web/**'],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,

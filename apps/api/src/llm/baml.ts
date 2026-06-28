@@ -1,26 +1,30 @@
 import type { EntityType } from '@kg/shared';
+import { embedText } from './mock.js';
 import type { GraphExtraction, LlmProvider } from './provider.js';
 
 /**
  * BAML-backed provider.
  *
- * The generated BAML client (`@kg/baml` / `packages/baml/baml_client`) may not
- * exist until `npm run baml:generate` has been run, so we NEVER statically
- * import it — that would break `tsc`/`tsup` in a fresh checkout. Instead we
- * lazily `await import()` it behind try/catch and surface a clear, actionable
- * error if it's missing or unconfigured.
+ * Extraction and answering are real BAML functions (`ExtractKnowledgeGraph`,
+ * `AnswerQuestion` in `packages/baml/baml_src`), executed through the generated
+ * typed client with automatic Claude → GPT-4o → Mistral fallback.
  *
- * The exact shape of the generated client depends on the .baml definitions the
- * maintainer writes, so the calls below are written defensively and documented;
- * verify the function names against your `baml_src` when wiring real keys.
+ * Embeddings are NOT an LLM function — BAML covers structured generation, not
+ * vector embedding — so we reuse the same deterministic local embedder as the
+ * mock provider. This keeps retrieval consistent across providers; swap in a
+ * real embedding model (e.g. text-embedding-3) here for production.
+ *
+ * The generated client (`@kg/baml`) may not exist until `npm run baml:generate`
+ * has run, so we NEVER statically import it (that would break `tsc`/`tsup` in a
+ * fresh checkout). We lazily `await import()` it and surface a clear, actionable
+ * error if it's missing.
  */
 export class BamlLlmProvider implements LlmProvider {
   readonly name = 'baml';
 
-  // Cached, dynamically-imported client (typed loosely on purpose).
   private clientPromise: Promise<BamlClientLike> | undefined;
 
-  private async client(): Promise<BamlClientLike> {
+  private client(): Promise<BamlClientLike> {
     if (!this.clientPromise) {
       this.clientPromise = loadBamlClient();
     }
@@ -28,35 +32,19 @@ export class BamlLlmProvider implements LlmProvider {
   }
 
   async embed(texts: string[]): Promise<number[][]> {
-    const b = await this.client();
-    if (typeof b.Embed !== 'function') {
-      throw new Error(
-        'BAML client has no `Embed` function. Add an embedding function to your baml_src or use LLM_PROVIDER=mock.',
-      );
-    }
-    const out = await Promise.all(texts.map((t) => b.Embed!(t)));
-    return out.map((v) => v as number[]);
+    return texts.map((t) => embedText(t));
   }
 
   async extractGraph(chunkText: string): Promise<GraphExtraction> {
     const b = await this.client();
-    if (typeof b.ExtractGraph !== 'function') {
-      throw new Error(
-        'BAML client has no `ExtractGraph` function. Add it to your baml_src or use LLM_PROVIDER=mock.',
-      );
-    }
-    const raw = (await b.ExtractGraph(chunkText)) as RawBamlGraph;
+    const raw = (await b.ExtractKnowledgeGraph(chunkText)) as RawBamlGraph;
     return normalizeBamlGraph(raw);
   }
 
   async answer(question: string, context: string): Promise<string> {
     const b = await this.client();
-    if (typeof b.Answer !== 'function') {
-      throw new Error(
-        'BAML client has no `Answer` function. Add it to your baml_src or use LLM_PROVIDER=mock.',
-      );
-    }
-    return (await b.Answer(question, context)) as string;
+    const result = (await b.AnswerQuestion(question, context)) as RawGroundedAnswer;
+    return (result.answer ?? '').trim();
   }
 }
 
@@ -64,24 +52,21 @@ export class BamlLlmProvider implements LlmProvider {
 /* Dynamic loading                                                     */
 /* ------------------------------------------------------------------ */
 
-/** Loosely-typed view of whatever the generated client exposes. */
+/** The two BAML functions this provider relies on (see baml_src). */
 interface BamlClientLike {
-  Embed?: (text: string) => Promise<unknown>;
-  ExtractGraph?: (text: string) => Promise<unknown>;
-  Answer?: (question: string, context: string) => Promise<unknown>;
+  ExtractKnowledgeGraph: (chunk: string) => Promise<unknown>;
+  AnswerQuestion: (question: string, context: string) => Promise<unknown>;
+}
+
+interface RawGroundedAnswer {
+  answer?: string;
+  used_entities?: string[];
+  confidence?: number;
 }
 
 interface RawBamlGraph {
-  entities?: Array<{ label?: string; name?: string; type?: string; properties?: Record<string, string> }>;
-  relations?: Array<{
-    sourceLabel?: string;
-    source?: string;
-    targetLabel?: string;
-    target?: string;
-    type?: string;
-    label?: string;
-    weight?: number;
-  }>;
+  entities?: Array<{ name?: string; type?: string; description?: string }>;
+  relations?: Array<{ source?: string; target?: string; type?: string; label?: string }>;
 }
 
 /**
@@ -94,15 +79,15 @@ async function loadBamlClient(): Promise<BamlClientLike> {
   for (const spec of candidates) {
     try {
       const mod = (await import(/* @vite-ignore */ spec)) as Record<string, unknown>;
-      // The generated client commonly exposes a `b` singleton.
+      // The generated client exposes a `b` singleton of function handles.
       const client = (mod.b ?? mod.default ?? mod) as BamlClientLike;
-      return client;
+      if (typeof client.ExtractKnowledgeGraph === 'function') return client;
     } catch (err) {
       lastErr = err;
     }
   }
   throw new Error(
-    'BAML client not found. Run `npm run baml:generate` and set ANTHROPIC_API_KEY/OPENAI_API_KEY, ' +
+    'BAML client not found. Run `npm run baml:generate` and set ANTHROPIC_API_KEY/OPENAI_API_KEY/MISTRAL_API_KEY, ' +
       'or set LLM_PROVIDER=mock to run offline. ' +
       `(underlying error: ${lastErr instanceof Error ? lastErr.message : String(lastErr)})`,
   );
@@ -120,26 +105,27 @@ const ENTITY_TYPES: ReadonlySet<string> = new Set([
 ]);
 
 function coerceType(t: string | undefined): EntityType {
-  return t && ENTITY_TYPES.has(t) ? (t as EntityType) : 'other';
+  const lower = t?.toLowerCase();
+  return lower && ENTITY_TYPES.has(lower) ? (lower as EntityType) : 'other';
 }
 
-/** Map the generated client's loose output into our local extraction shape. */
+/** Map the generated client's output into our local extraction shape. */
 function normalizeBamlGraph(raw: RawBamlGraph): GraphExtraction {
   const entities = (raw.entities ?? [])
     .map((e) => ({
-      label: (e.label ?? e.name ?? '').trim(),
+      label: (e.name ?? '').trim(),
       type: coerceType(e.type),
-      properties: e.properties,
+      ...(e.description ? { properties: { description: e.description } } : {}),
     }))
     .filter((e) => e.label.length > 0);
 
   const relations = (raw.relations ?? [])
     .map((r) => ({
-      sourceLabel: (r.sourceLabel ?? r.source ?? '').trim(),
-      targetLabel: (r.targetLabel ?? r.target ?? '').trim(),
+      sourceLabel: (r.source ?? '').trim(),
+      targetLabel: (r.target ?? '').trim(),
       type: r.type ?? 'RELATED_TO',
       label: r.label ?? 'related to',
-      weight: typeof r.weight === 'number' ? r.weight : 0.5,
+      weight: 0.6,
     }))
     .filter((r) => r.sourceLabel.length > 0 && r.targetLabel.length > 0);
 
