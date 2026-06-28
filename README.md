@@ -1,7 +1,16 @@
 # 🧠 Knowledge-Graph RAG Explorer
 
+![CI](https://img.shields.io/github/actions/workflow/status/soneeee22000/Knowledge-Graph-RAG-Explorer/ci.yml?label=CI)
+![Vue 3](https://img.shields.io/badge/Vue-3-42b883?logo=vuedotjs&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-20+-339933?logo=nodedotjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)
+![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
+![Last commit](https://img.shields.io/github/last-commit/soneeee22000/Knowledge-Graph-RAG-Explorer)
+
 > Ingest documents → watch a **knowledge graph** assemble itself on an interactive
 > canvas → ask questions and watch an **agent reason** over the graph in real time.
+
+![Knowledge-Graph RAG Explorer — the assembled knowledge graph with the agentic RAG chat](docs/screenshot.png)
 
 A full-stack, end-to-end showcase of **agentic RAG made transparent**. Drop in
 text, and the system chunks it, embeds it, extracts a typed knowledge graph, and
@@ -161,4 +170,4 @@ push.
 
 ## License
 
-MIT
+[MIT](LICENSE) © Pyae Sone (Seon) — [github.com/soneeee22000](https://github.com/soneeee22000)
