@@ -1,0 +1,130 @@
+@import 'tailwindcss';
+
+/* VueFlow base styles + add-ons. Imported here so a single stylesheet drives
+   the whole app. The maintainer should confirm these package paths resolve. */
+@import '@vue-flow/core/dist/style.css';
+@import '@vue-flow/core/dist/theme-default.css';
+@import '@vue-flow/controls/dist/style.css';
+@import '@vue-flow/minimap/dist/style.css';
+
+/* Tailwind v4 design tokens (CSS-first config). */
+@theme {
+  --color-canvas: #0a0b11;
+  --color-surface: #11131c;
+  --color-surface-2: #161924;
+  --color-border-soft: #232838;
+  --color-accent: #6366f1;
+  --color-accent-2: #22d3ee;
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(
+      1200px 800px at 15% -10%,
+      rgba(99, 102, 241, 0.12),
+      transparent 60%
+    ),
+    radial-gradient(
+      1000px 700px at 95% 110%,
+      rgba(34, 211, 238, 0.08),
+      transparent 55%
+    ),
+    #0a0b11;
+  color: #e5e7eb;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Thin, dark scrollbars to match the frontier-AI aesthetic. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2a3040 transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: #2a3040;
+  border-radius: 9999px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: #3a4255;
+}
+
+/* VueFlow canvas: make it transparent so our gradient shows through. */
+.vue-flow {
+  background: transparent;
+}
+.vue-flow__edge-path {
+  stroke: #3a4255;
+  stroke-width: 1.5;
+}
+.vue-flow__edge.animated .vue-flow__edge-path {
+  stroke: var(--color-accent);
+}
+.vue-flow__edge-text {
+  fill: #9ca3af;
+  font-size: 10px;
+}
+.vue-flow__edge-textbg {
+  fill: #11131c;
+}
+.vue-flow__minimap {
+  background-color: rgba(17, 19, 28, 0.85) !important;
+  border-radius: 12px;
+  border: 1px solid var(--color-border-soft);
+}
+.vue-flow__controls {
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+.vue-flow__controls-button {
+  background: #161924 !important;
+  border-bottom: 1px solid #232838 !important;
+  fill: #cbd5e1 !important;
+}
+.vue-flow__controls-button:hover {
+  background: #232838 !important;
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@keyframes caret-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.typewriter-caret::after {
+  content: '▋';
+  margin-left: 1px;
+  color: var(--color-accent);
+  animation: caret-blink 1s step-end infinite;
+}

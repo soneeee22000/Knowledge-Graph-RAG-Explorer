@@ -1,0 +1,31 @@
+{
+  "name": "@kg/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Knowledge-Graph RAG Explorer — Fastify + Mastra backend (agentic RAG over a knowledge graph).",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsup src/index.ts --format esm --target node20 --clean",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@fastify/cors": "^10.0.1",
+    "@kg/shared": "*",
+    "@mastra/core": "^0.10.0",
+    "fastify": "^5.2.0",
+    "graphology": "^0.26.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsup": "^8.3.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^3.0.5"
+  }
+}

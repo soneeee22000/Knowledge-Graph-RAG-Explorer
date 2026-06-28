@@ -1,0 +1,33 @@
+# Local full-stack run: `docker compose up --build`
+# API on :8000, web on :3000. Defaults to the offline mock LLM provider.
+services:
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      PORT: '8000'
+      HOST: '0.0.0.0'
+      LLM_PROVIDER: ${LLM_PROVIDER:-mock}
+      CORS_ORIGIN: '*'
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      MISTRAL_API_KEY: ${MISTRAL_API_KEY:-}
+    ports:
+      - '8000:8000'
+    volumes:
+      - api-data:/app/apps/api/data
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        VITE_API_URL: http://localhost:8000
+    ports:
+      - '3000:80'
+    depends_on:
+      - api
+
+volumes:
+  api-data:

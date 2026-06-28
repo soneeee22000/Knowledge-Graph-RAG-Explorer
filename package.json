@@ -1,0 +1,34 @@
+{
+  "name": "kg-rag-explorer",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Knowledge-Graph RAG Explorer — agentic RAG over an interactive knowledge graph. Vue 3 + Node/TS + Mastra + BAML + VueFlow.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "prepare": "npm run build --workspace @kg/shared",
+    "dev": "npm run dev --workspaces --if-present",
+    "dev:api": "npm run dev --workspace @kg/api",
+    "dev:web": "npm run dev --workspace @kg/web",
+    "build": "npm run build --workspace @kg/shared && npm run build --workspace @kg/api && npm run build --workspace @kg/web",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "eslint . --max-warnings=0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "npm run test --workspaces --if-present",
+    "baml:generate": "baml-cli generate --from packages/baml/baml_src"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "eslint": "^9.17.0",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.18.0"
+  }
+}

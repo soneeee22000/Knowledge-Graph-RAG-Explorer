@@ -1,0 +1,20 @@
+{
+  "name": "@kg/baml",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "BAML (BoundaryML) LLM function definitions and generated TypeScript client.",
+  "exports": {
+    ".": {
+      "types": "./baml_client/index.ts",
+      "default": "./baml_client/index.ts"
+    }
+  },
+  "scripts": {
+    "generate": "baml-cli generate --from baml_src",
+    "test:baml": "baml-cli test --from baml_src"
+  },
+  "dependencies": {
+    "@boundaryml/baml": "^0.68.0"
+  }
+}
