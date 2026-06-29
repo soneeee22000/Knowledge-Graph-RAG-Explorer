@@ -14,10 +14,11 @@ import type { GraphExtraction, LlmProvider } from './provider.js';
  * mock provider. This keeps retrieval consistent across providers; swap in a
  * real embedding model (e.g. text-embedding-3) here for production.
  *
- * The generated client (`@kg/baml`) may not exist until `npm run baml:generate`
- * has run, so we NEVER statically import it (that would break `tsc`/`tsup` in a
- * fresh checkout). We lazily `await import()` it and surface a clear, actionable
- * error if it's missing.
+ * The generated client (`@kg/baml`) is TypeScript-only and may not exist until
+ * `npm run baml:generate` has run. We `await import()` it lazily (only when a
+ * real model is actually used) and surface a clear, actionable error if it's
+ * missing. The API bundle force-includes `@kg/baml` (see `tsup.config.ts`) so
+ * the compiled `node dist` runtime can load it without a TS loader.
  */
 export class BamlLlmProvider implements LlmProvider {
   readonly name = 'baml';
@@ -70,27 +71,34 @@ interface RawBamlGraph {
 }
 
 /**
- * Try the published package name first, then the in-repo generated path.
- * Both are dynamic so missing files never break the build.
+ * Load the generated BAML client.
+ *
+ * The default `Primary` client is a `fallback` over Claude → GPT-4o → Mistral.
+ * BAML resolves every member's `api_key` when the fallback client is built, so
+ * an *unset* `OPENAI_API_KEY` / `MISTRAL_API_KEY` aborts the whole chain even
+ * though Claude (first, and the only key most users set) would succeed. We
+ * default those optional keys to empty so the fallback initializes and Claude
+ * is used; supply real keys to make the GPT-4o / Mistral legs functional.
  */
 async function loadBamlClient(): Promise<BamlClientLike> {
-  const candidates = ['@kg/baml', '@kg/baml/baml_client', '../../../../packages/baml/baml_client'];
-  let lastErr: unknown;
-  for (const spec of candidates) {
-    try {
-      const mod = (await import(/* @vite-ignore */ spec)) as Record<string, unknown>;
-      // The generated client exposes a `b` singleton of function handles.
-      const client = (mod.b ?? mod.default ?? mod) as BamlClientLike;
-      if (typeof client.ExtractKnowledgeGraph === 'function') return client;
-    } catch (err) {
-      lastErr = err;
-    }
+  process.env.OPENAI_API_KEY ??= '';
+  process.env.MISTRAL_API_KEY ??= '';
+  try {
+    // Static specifier so the bundler can inline the TS-only client (tsup
+    // `noExternal`); resolves via the workspace symlink under tsx in dev.
+    const mod = (await import('@kg/baml')) as Record<string, unknown>;
+    // The generated client exposes a `b` singleton of function handles.
+    const client = (mod.b ?? mod.default ?? mod) as BamlClientLike;
+    if (typeof client.ExtractKnowledgeGraph === 'function') return client;
+    throw new Error('generated @kg/baml client is missing ExtractKnowledgeGraph');
+  } catch (err) {
+    throw new Error(
+      'BAML client not found. Run `npm run baml:generate` and set ANTHROPIC_API_KEY ' +
+        '(optionally OPENAI_API_KEY / MISTRAL_API_KEY for the fallback legs), ' +
+        'or set LLM_PROVIDER=mock to run offline. ' +
+        `(underlying error: ${err instanceof Error ? err.message : String(err)})`,
+    );
   }
-  throw new Error(
-    'BAML client not found. Run `npm run baml:generate` and set ANTHROPIC_API_KEY/OPENAI_API_KEY/MISTRAL_API_KEY, ' +
-      'or set LLM_PROVIDER=mock to run offline. ' +
-      `(underlying error: ${lastErr instanceof Error ? lastErr.message : String(lastErr)})`,
-  );
 }
 
 const ENTITY_TYPES: ReadonlySet<string> = new Set([

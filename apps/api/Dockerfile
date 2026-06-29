@@ -8,7 +8,9 @@ COPY apps/api/package.json apps/api/
 COPY apps/web/package.json apps/web/
 RUN npm install
 COPY . .
-RUN npm run build --workspace @kg/shared && npm run build --workspace @kg/api
+RUN npm run baml:generate \
+  && npm run build --workspace @kg/shared \
+  && npm run build --workspace @kg/api
 
 FROM node:20-slim AS runtime
 WORKDIR /app
