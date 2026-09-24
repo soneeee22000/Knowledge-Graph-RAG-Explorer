@@ -4,11 +4,14 @@ import {
   CitationSchema,
   EntitySchema,
   RelationSchema,
+  type Chunk,
   type Citation,
   type Entity,
   type Relation,
 } from '@kg/shared';
 import type { AppStores } from '../services/stores.js';
+import type { VectorHit } from '../services/vectorStore.js';
+import { augmentWithGraph, type GraphAugmentation } from './graphRetrieval.js';
 
 /**
  * Shared retrieval logic — the single real implementation behind BOTH the
@@ -17,22 +20,67 @@ import type { AppStores } from '../services/stores.js';
  * never decorative.
  */
 
+/** Longest snippet carried by a citation. */
+const SNIPPET_LENGTH = 280;
+
+function toCitation(stores: AppStores, chunk: Chunk, score: number): Citation {
+  const document = stores.corpus.listDocuments().find((d) => d.id === chunk.documentId);
+  return {
+    chunkId: chunk.id,
+    documentId: chunk.documentId,
+    documentTitle: document?.title ?? chunk.documentId,
+    snippet: chunk.text.slice(0, SNIPPET_LENGTH),
+    score,
+  };
+}
+
+/** Every chunk in the corpus ranked by cosine similarity to the query, best first. */
+export async function rankAllChunks(stores: AppStores, query: string): Promise<VectorHit[]> {
+  const [embedding] = await stores.provider.embed([query]);
+  return stores.vectorStore.search(embedding ?? [], stores.vectorStore.size);
+}
+
 /** Dense vector retrieval → citations, via the configured provider's embedder. */
 export async function retrieveContext(
   stores: AppStores,
   query: string,
   topK: number,
 ): Promise<Citation[]> {
-  const [embedding] = await stores.provider.embed([query]);
-  const hits = stores.vectorStore.search(embedding ?? [], topK);
-  const documents = new Map(stores.corpus.listDocuments().map((d) => [d.id, d]));
-  return hits.map((hit) => ({
-    chunkId: hit.chunk.id,
-    documentId: hit.chunk.documentId,
-    documentTitle: documents.get(hit.chunk.documentId)?.title ?? hit.chunk.documentId,
-    snippet: hit.chunk.text.slice(0, 280),
-    score: hit.score,
-  }));
+  const hits = (await rankAllChunks(stores, query)).slice(0, topK);
+  return hits.map((hit) => toCitation(stores, hit.chunk, hit.score));
+}
+
+/** Vector top-k plus the graph-augmented top-k built from the same ranking. */
+export interface GraphRetrievalResult {
+  vectorCitations: Citation[];
+  citations: Citation[];
+  augmentation: GraphAugmentation;
+}
+
+/**
+ * Retrieve with graph expansion: rank the corpus once, then let
+ * `augmentWithGraph` add graph-reached chunks and rerank the union. Citation
+ * scores stay the cosine similarity; the order is the combined score.
+ */
+export async function retrieveWithGraph(
+  stores: AppStores,
+  query: string,
+  topK: number,
+): Promise<GraphRetrievalResult> {
+  const ranking = await rankAllChunks(stores, query);
+  const chunks = new Map(ranking.map((hit) => [hit.chunk.id, hit.chunk]));
+  const augmentation = augmentWithGraph(
+    ranking.map((hit) => ({ chunkId: hit.chunk.id, score: hit.score })),
+    stores.graphStore.toKnowledgeGraph(),
+    topK,
+  );
+  const cite = (chunkId: string, score: number): Citation =>
+    toCitation(stores, chunks.get(chunkId)!, score);
+  return {
+    vectorCitations: ranking.slice(0, topK).map((hit) => toCitation(stores, hit.chunk, hit.score)),
+    citations: augmentation.ranked.map((c) => cite(c.chunkId, c.vectorScore)),
+    augmentation,
+  };
 }
 
 /** Expand seed entities along graph edges to a hop depth. */

@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { Agent } from '@mastra/core/agent';
 import type {
   Answer,
+  Citation,
   Entity,
   QueryEvent,
   QueryRequest,
@@ -12,8 +13,7 @@ import type {
 } from '@kg/shared';
 import { config } from '../config.js';
 import type { AppStores } from '../services/stores.js';
-import { expandFromCitations, rerankByGraph } from './graphRetrieval.js';
-import { createRagTools, retrieveContext } from './tools.js';
+import { createRagTools, retrieveWithGraph, type GraphRetrievalResult } from './tools.js';
 
 /** Async sink for streamed query events. */
 export type QueryEmit = (event: QueryEvent) => void | Promise<void>;
@@ -141,6 +141,40 @@ function tokenize(text: string): string[] {
   return text.match(/\S+\s*/g) ?? [text];
 }
 
+/** Stream the graph-expand step: the sub-graph walked from the seed chunks. */
+async function emitGraphExpansion(emit: QueryEmit, retrieval: GraphRetrievalResult): Promise<void> {
+  const { subgraph, addedChunkIds } = retrieval.augmentation;
+  const step = await beginStep(emit, 'graph-expand', 'Expanding knowledge graph');
+  await emit({ type: 'graph', entities: subgraph.entities, relations: subgraph.relations });
+  await endStep(
+    emit,
+    step,
+    'graph-expand',
+    'Expanding knowledge graph',
+    `Traversed ${subgraph.entities.length} entit(ies) and ${subgraph.relations.length} ` +
+      `relation(s); reached ${addedChunkIds.length} chunk(s) outside the vector top-k.`,
+  );
+}
+
+/** Stream the rerank step over the union of vector and graph candidates. */
+async function emitGraphRerank(
+  emit: QueryEmit,
+  retrieval: GraphRetrievalResult,
+): Promise<Citation[]> {
+  const { addedChunkIds, promotedChunkIds } = retrieval.augmentation;
+  const step = await beginStep(emit, 'rerank', 'Reranking vector + graph candidates');
+  await emit({ type: 'retrieved', citations: retrieval.citations });
+  await endStep(
+    emit,
+    step,
+    'rerank',
+    'Reranking vector + graph candidates',
+    `Added ${addedChunkIds.length} chunk(s) through the graph; ` +
+      `${promotedChunkIds.length} made the final top-${retrieval.citations.length}.`,
+  );
+  return retrieval.citations;
+}
+
 /**
  * Execute the agentic RAG pipeline, emitting a `QueryEvent` for each step.
  * Mirrors the Mastra agent's documented flow but runs deterministically with
@@ -181,7 +215,8 @@ export async function runRagQuery(
 
     // 2. RETRIEVE ---------------------------------------------------------
     const retrieveStep = await beginStep(emit, 'retrieve', 'Retrieving context');
-    const citations = await retrieveContext(stores, req.question, req.topK);
+    const retrieval = await retrieveWithGraph(stores, req.question, req.topK);
+    const citations = retrieval.vectorCitations;
     await emit({ type: 'retrieved', citations });
     await endStep(
       emit,
@@ -191,42 +226,16 @@ export async function runRagQuery(
       `Retrieved ${citations.length} chunk(s).`,
     );
 
-    // 3. GRAPH-EXPAND -----------------------------------------------------
+    // 3. GRAPH-EXPAND + 4. RERANK ----------------------------------------
     const usedEntities: Entity[] = [];
     const usedRelations: Relation[] = [];
-    if (req.useGraphExpansion) {
-      const graphStep = await beginStep(emit, 'graph-expand', 'Expanding knowledge graph');
-      const expanded = expandFromCitations(stores.graphStore, citations);
-      usedEntities.push(...expanded.entities);
-      usedRelations.push(...expanded.relations);
-
-      await emit({ type: 'graph', entities: usedEntities, relations: usedRelations });
-      await endStep(
-        emit,
-        graphStep,
-        'graph-expand',
-        'Expanding knowledge graph',
-        `Traversed ${usedEntities.length} entit(ies) and ${usedRelations.length} relation(s).`,
-      );
-    }
-
-    // 4. RERANK (graph-aware) --------------------------------------------
-    // Boost chunks that contributed an entity surfaced during graph expansion,
-    // so graph-connected evidence floats to the top before synthesis.
     let rankedCitations = citations;
-    if (req.useGraphExpansion && usedEntities.length > 0) {
-      const rerankStep = await beginStep(emit, 'rerank', 'Reranking by graph signal');
-      const rerank = rerankByGraph(citations, usedEntities);
-      rankedCitations = rerank.ranked;
-      const boostedCount = rerank.boostedCount;
-      await emit({ type: 'retrieved', citations: rankedCitations });
-      await endStep(
-        emit,
-        rerankStep,
-        'rerank',
-        'Reranking by graph signal',
-        `Boosted ${boostedCount} graph-connected chunk(s).`,
-      );
+    if (req.useGraphExpansion) {
+      const { subgraph } = retrieval.augmentation;
+      usedEntities.push(...subgraph.entities);
+      usedRelations.push(...subgraph.relations);
+      await emitGraphExpansion(emit, retrieval);
+      rankedCitations = await emitGraphRerank(emit, retrieval);
     }
 
     // 5. SYNTHESIZE -------------------------------------------------------
