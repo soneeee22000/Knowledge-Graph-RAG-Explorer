@@ -133,3 +133,22 @@ describe('default (writable) mode', () => {
     }
   });
 });
+
+describe('client IP behind a proxy (TRUST_PROXY=1)', () => {
+  function getVia(app: FastifyInstance, forwardedFor: string): Promise<LightMyRequestResponse> {
+    return app.inject({
+      method: 'GET',
+      url: '/api/documents',
+      remoteAddress: '10.9.9.9',
+      headers: { 'x-forwarded-for': forwardedFor },
+    });
+  }
+
+  it('uses the address the proxy appended, so client-sent X-Forwarded-For entries cannot dodge the limit', async () => {
+    const app = await start({ DEMO_READONLY: '1', RATE_LIMIT_PER_MINUTE: '2', TRUST_PROXY: '1' });
+    expect((await getVia(app, 'spoof-1, 203.0.113.7')).statusCode).toBe(200);
+    expect((await getVia(app, 'spoof-2, 203.0.113.7')).statusCode).toBe(200);
+    expect((await getVia(app, 'spoof-3, 203.0.113.7')).statusCode).toBe(429);
+    expect((await getVia(app, '203.0.113.8')).statusCode).toBe(200);
+  });
+});

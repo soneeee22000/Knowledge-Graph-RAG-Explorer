@@ -10,6 +10,12 @@ import { AppStores } from './services/stores.js';
 export const DEMO_DEFAULT_RATE_LIMIT_PER_MINUTE = 60;
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_EXEMPT_PATHS = new Set(['/api/health']);
+/**
+ * With TRUST_PROXY, trust exactly one proxy hop: the client IP is the last
+ * X-Forwarded-For entry, the one the platform's proxy wrote. Entries a client
+ * sends ahead of it are ignored, so they cannot be used to dodge the limit.
+ */
+const TRUSTED_PROXY_HOPS = 1;
 
 /** The per-minute limit in force, or undefined when rate limiting is off. */
 export function effectiveRateLimit(cfg: Config): number | undefined {
@@ -54,7 +60,7 @@ export async function buildServer(options: BuildServerOptions = {}): Promise<Fas
   await stores.load();
   if (cfg.DEMO_READONLY) await seedDemoCorpus(stores);
 
-  const app = Fastify({ logger: false, trustProxy: cfg.TRUST_PROXY });
+  const app = Fastify({ logger: false, trustProxy: cfg.TRUST_PROXY ? TRUSTED_PROXY_HOPS : false });
 
   await app.register(cors, {
     origin: cfg.CORS_ORIGIN === '*' ? true : cfg.CORS_ORIGIN.split(',').map((s) => s.trim()),

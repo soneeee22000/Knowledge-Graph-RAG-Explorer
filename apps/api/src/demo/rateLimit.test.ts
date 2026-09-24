@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { FixedWindowRateLimiter } from './rateLimit.js';
+import { DEFAULT_MAX_TRACKED_KEYS, FixedWindowRateLimiter } from './rateLimit.js';
 
 const WINDOW_MS = 60_000;
 
@@ -37,5 +37,28 @@ describe('FixedWindowRateLimiter', () => {
     now = WINDOW_MS * 2;
     limiter.take('fresh');
     expect(limiter.trackedKeys).toBe(1);
+  });
+});
+
+describe('FixedWindowRateLimiter key cap', () => {
+  it('refuses new keys once the cap is reached, but keeps serving tracked keys', () => {
+    let now = 0;
+    const limiter = new FixedWindowRateLimiter(2, WINDOW_MS, () => now, 3);
+    expect(limiter.take('a').allowed).toBe(true);
+    expect(limiter.take('b').allowed).toBe(true);
+    expect(limiter.take('c').allowed).toBe(true);
+    const refused = limiter.take('d');
+    expect(refused.allowed).toBe(false);
+    expect(refused.retryAfterSeconds).toBeGreaterThan(0);
+    expect(limiter.trackedKeys).toBe(3);
+    expect(limiter.take('a').allowed).toBe(true);
+    now = WINDOW_MS;
+    expect(limiter.take('d').allowed).toBe(true);
+  });
+
+  it('has a default cap, so a flood of distinct keys cannot grow memory without bound', () => {
+    const limiter = new FixedWindowRateLimiter(1, WINDOW_MS, () => 0);
+    for (let i = 0; i < DEFAULT_MAX_TRACKED_KEYS + 50; i++) limiter.take(`ip-${i}`);
+    expect(limiter.trackedKeys).toBe(DEFAULT_MAX_TRACKED_KEYS);
   });
 });

@@ -3,7 +3,7 @@ import type { AddressInfo } from 'node:net';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { createVercelHandler } from './vercel.js';
+import { createVercelHandler, serverlessEnv } from './vercel.js';
 
 interface Health {
   readOnly: boolean;
@@ -85,5 +85,19 @@ describe('createVercelHandler without DEMO_READONLY', () => {
     } finally {
       await new Promise<void>((resolve) => plain.close(() => resolve()));
     }
+  });
+});
+
+describe('serverlessEnv', () => {
+  it('forces read-only mode whatever the environment says', () => {
+    expect(serverlessEnv({ DEMO_READONLY: '0' }).DEMO_READONLY).toBe('1');
+  });
+
+  it('defaults DATA_DIR to the OS temp directory, the only writable path in a function', () => {
+    expect(serverlessEnv({}).DATA_DIR).toBe(join(tmpdir(), 'kg-data'));
+  });
+
+  it('keeps an explicit DATA_DIR', () => {
+    expect(serverlessEnv({ DATA_DIR: '/tmp/custom' }).DATA_DIR).toBe('/tmp/custom');
   });
 });
