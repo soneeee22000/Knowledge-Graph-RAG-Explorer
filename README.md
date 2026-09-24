@@ -48,6 +48,7 @@ flowchart LR
   subgraph API["apps/api: Fastify"]
     Ingest["Ingestion pipeline"]
     Pipeline["runRagQuery<br/>plan, retrieve, graph-expand, rerank, synthesize"]
+    Helpers["retrieveContext, expandFromCitations,<br/>rerankByGraph"]
     Agent["Mastra agent<br/>plan step, only with a key"]
     VS[("Vector store<br/>in-memory cosine")]
     KG[("Knowledge graph<br/>graphology")]
@@ -58,7 +59,8 @@ flowchart LR
     Baml["BAML: ExtractKnowledgeGraph,<br/>AnswerQuestion"]
   end
 
-  Eval["Retrieval eval<br/>apps/api/eval"] --> Pipeline
+  Eval["Retrieval eval<br/>apps/api/eval"] --> Helpers
+  Pipeline --> Helpers
   Web <-->|"SSE + REST, typed by"| Shared
   Shared <--> API
   Ingest --> VS

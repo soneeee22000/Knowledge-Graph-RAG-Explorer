@@ -13,7 +13,7 @@
 | **Contracts**  | Front end and back end drift apart on event and data shapes.                      | One `@kg/shared` package of Zod schemas, used by both apps and validated at the boundaries.                                            |
 | **Ingestion**  | You cannot see how a document turned into chunks, vectors and entities.           | Chunk → embed → extract → link → persist, with each phase streamed as an `IngestEvent`.                                                |
 | **Retrieval**  | Vector search and graph expansion are mixed, so neither can be judged on its own. | Vector retrieval, one-hop graph expansion and a graph rerank are separate functions, each unit-tested.                                 |
-| **Reasoning**  | The steps between the question and the answer are hidden.                         | Each step is streamed as a `ThoughtStep` and drawn as a timeline. Cited entities are highlighted on a VueFlow canvas.                  |
+| **Reasoning**  | The steps between the question and the answer are hidden.                         | Each step is streamed as a `ThoughtStep` and drawn as a timeline. Traversed entities are highlighted on a VueFlow canvas.              |
 | **Evaluation** | "Graph helps" gets asserted rather than measured.                                 | An authored 20-question set compares graph-expand with vector-only on the same candidates. The results are committed and diffed by CI. |
 
 ## What this is not
