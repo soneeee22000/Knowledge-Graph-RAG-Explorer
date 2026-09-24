@@ -1,0 +1,16 @@
+# Render Blueprint for the API only (the web app goes to Vercel, see docs/DEPLOY.md).
+# Free plan, keyless: the deterministic mock provider needs no secrets.
+services:
+  - type: web
+    name: kg-rag-explorer-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./apps/api/Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    autoDeploy: false
+    envVars:
+      - key: LLM_PROVIDER
+        value: mock
+      - key: CORS_ORIGIN
+        sync: false
