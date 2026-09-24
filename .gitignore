@@ -32,3 +32,12 @@ npm-debug.log*
 # test / coverage
 coverage/
 .vitest/
+
+# deploy tooling
+.vercel/
+
+# AI tool working dirs
+.claude/
+.sixth/
+.cursor/
+CLAUDE.md
