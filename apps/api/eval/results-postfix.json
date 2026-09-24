@@ -1,0 +1,542 @@
+{
+  "evalSet": {
+    "name": "valdane-rail-retrieval-postfix-v1",
+    "author": "repo author (post-fix stratum)",
+    "items": 8
+  },
+  "corpus": {
+    "name": "valdane-rail",
+    "documents": 10,
+    "chunks": 12,
+    "entities": 51,
+    "relations": 68
+  },
+  "config": {
+    "provider": "mock",
+    "topK": 6,
+    "graphBoost": 0.15,
+    "expansionDepth": 1,
+    "seedChunkCount": 3,
+    "hopDecay": 0.5,
+    "graphSupportWeight": 1
+  },
+  "summary": {
+    "vectorOnly": {
+      "all": {
+        "items": 8,
+        "hitAt1": 6,
+        "hitAt3": 8,
+        "mrr": 0.875,
+        "allEvidenceRetrieved": 6,
+        "evidenceFound": 14,
+        "evidenceTotal": 16
+      },
+      "byKind": {
+        "multi-hop": {
+          "items": 8,
+          "hitAt1": 6,
+          "hitAt3": 8,
+          "mrr": 0.875,
+          "allEvidenceRetrieved": 6,
+          "evidenceFound": 14,
+          "evidenceTotal": 16
+        }
+      }
+    },
+    "graphExpand": {
+      "all": {
+        "items": 8,
+        "hitAt1": 6,
+        "hitAt3": 8,
+        "mrr": 0.875,
+        "allEvidenceRetrieved": 6,
+        "evidenceFound": 14,
+        "evidenceTotal": 16
+      },
+      "byKind": {
+        "multi-hop": {
+          "items": 8,
+          "hitAt1": 6,
+          "hitAt3": 8,
+          "mrr": 0.875,
+          "allEvidenceRetrieved": 6,
+          "evidenceFound": 14,
+          "evidenceTotal": 16
+        }
+      }
+    },
+    "graphAugmented": {
+      "all": {
+        "items": 8,
+        "hitAt1": 6,
+        "hitAt3": 8,
+        "mrr": 0.875,
+        "allEvidenceRetrieved": 6,
+        "evidenceFound": 14,
+        "evidenceTotal": 16
+      },
+      "byKind": {
+        "multi-hop": {
+          "items": 8,
+          "hitAt1": 6,
+          "hitAt3": 8,
+          "mrr": 0.875,
+          "allEvidenceRetrieved": 6,
+          "evidenceFound": 14,
+          "evidenceTotal": 16
+        }
+      }
+    }
+  },
+  "comparison": {
+    "improved": 0,
+    "worsened": 0,
+    "unchanged": 8,
+    "orderChanged": 0
+  },
+  "comparisonAugmented": {
+    "improved": 0,
+    "worsened": 0,
+    "unchanged": 8,
+    "orderChanged": 5
+  },
+  "items": [
+    {
+      "id": "p01",
+      "kind": "multi-hop",
+      "question": "Which company holds the maintenance contract for the trains that serve Harbour Point?",
+      "vectorOnly": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "Rolling stock#0",
+          "Fares and tickets#0",
+          "Incident report: Harbour Point flood#0",
+          "The Amber Line#0",
+          "Depots and maintenance#0",
+          "Valdane Regional Rail#0"
+        ]
+      },
+      "graphExpand": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "Rolling stock#0",
+          "Fares and tickets#0",
+          "Incident report: Harbour Point flood#0",
+          "The Amber Line#0",
+          "Depots and maintenance#0",
+          "Valdane Regional Rail#0"
+        ],
+        "boostedChunks": 6
+      },
+      "graphAugmented": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "Rolling stock#0",
+          "Incident report: Harbour Point flood#0",
+          "The Amber Line#0",
+          "Depots and maintenance#0",
+          "Fares and tickets#0",
+          "The Cobalt Line#0"
+        ],
+        "addedChunks": [
+          "The Cobalt Line#0",
+          "Signalling#0",
+          "The Juniper Line#0",
+          "Valdane Regional Rail#1",
+          "The Amber Line#1",
+          "Governance#0"
+        ],
+        "promotedChunks": [
+          "The Cobalt Line#0"
+        ]
+      }
+    },
+    {
+      "id": "p02",
+      "kind": "multi-hop",
+      "question": "How many carriages do the trains to the airport have?",
+      "vectorOnly": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "The Cobalt Line#0",
+          "Rolling stock#0",
+          "The Juniper Line#0",
+          "The Amber Line#0",
+          "Incident report: Harbour Point flood#0",
+          "Fares and tickets#0"
+        ]
+      },
+      "graphExpand": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "The Cobalt Line#0",
+          "Rolling stock#0",
+          "The Juniper Line#0",
+          "The Amber Line#0",
+          "Incident report: Harbour Point flood#0",
+          "Fares and tickets#0"
+        ],
+        "boostedChunks": 6
+      },
+      "graphAugmented": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "The Cobalt Line#0",
+          "Rolling stock#0",
+          "The Juniper Line#0",
+          "The Amber Line#0",
+          "Incident report: Harbour Point flood#0",
+          "Fares and tickets#0"
+        ],
+        "addedChunks": [
+          "Depots and maintenance#0",
+          "Governance#0",
+          "Signalling#0",
+          "Valdane Regional Rail#0",
+          "Valdane Regional Rail#1",
+          "The Amber Line#1"
+        ],
+        "promotedChunks": []
+      }
+    },
+    {
+      "id": "p03",
+      "kind": "multi-hop",
+      "question": "In which town is the manufacturer of the Amber Line trains based?",
+      "vectorOnly": {
+        "rank": 2,
+        "evidenceFound": 1,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "The Juniper Line#0",
+          "The Amber Line#0",
+          "Valdane Regional Rail#0",
+          "Signalling#0",
+          "The Cobalt Line#0",
+          "Fares and tickets#0"
+        ]
+      },
+      "graphExpand": {
+        "rank": 2,
+        "evidenceFound": 1,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "The Juniper Line#0",
+          "The Amber Line#0",
+          "Valdane Regional Rail#0",
+          "Signalling#0",
+          "The Cobalt Line#0",
+          "Fares and tickets#0"
+        ],
+        "boostedChunks": 6
+      },
+      "graphAugmented": {
+        "rank": 2,
+        "evidenceFound": 1,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "The Juniper Line#0",
+          "The Amber Line#0",
+          "Valdane Regional Rail#0",
+          "Signalling#0",
+          "The Cobalt Line#0",
+          "Fares and tickets#0"
+        ],
+        "addedChunks": [
+          "Rolling stock#0",
+          "Incident report: Harbour Point flood#0",
+          "Valdane Regional Rail#1",
+          "Governance#0",
+          "Depots and maintenance#0",
+          "The Amber Line#1"
+        ],
+        "promotedChunks": []
+      }
+    },
+    {
+      "id": "p04",
+      "kind": "multi-hop",
+      "question": "Which company re-profiles the wheels of the trains used on the Juniper Line?",
+      "vectorOnly": {
+        "rank": 2,
+        "evidenceFound": 1,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "Fares and tickets#0",
+          "The Juniper Line#0",
+          "Valdane Regional Rail#0",
+          "The Cobalt Line#0",
+          "Signalling#0",
+          "The Amber Line#0"
+        ]
+      },
+      "graphExpand": {
+        "rank": 2,
+        "evidenceFound": 1,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "Fares and tickets#0",
+          "The Juniper Line#0",
+          "Valdane Regional Rail#0",
+          "The Cobalt Line#0",
+          "Signalling#0",
+          "The Amber Line#0"
+        ],
+        "boostedChunks": 6
+      },
+      "graphAugmented": {
+        "rank": 2,
+        "evidenceFound": 1,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "Fares and tickets#0",
+          "The Juniper Line#0",
+          "The Cobalt Line#0",
+          "Signalling#0",
+          "The Amber Line#0",
+          "Valdane Regional Rail#0"
+        ],
+        "addedChunks": [
+          "Depots and maintenance#0",
+          "Valdane Regional Rail#1",
+          "Governance#0",
+          "Incident report: Harbour Point flood#0",
+          "Rolling stock#0",
+          "The Amber Line#1"
+        ],
+        "promotedChunks": []
+      }
+    },
+    {
+      "id": "p05",
+      "kind": "multi-hop",
+      "question": "Which company manages the card whose zone does not include the airport?",
+      "vectorOnly": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "The Cobalt Line#0",
+          "Fares and tickets#0",
+          "Signalling#0",
+          "Incident report: Harbour Point flood#0",
+          "The Amber Line#1",
+          "Valdane Regional Rail#0"
+        ]
+      },
+      "graphExpand": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "The Cobalt Line#0",
+          "Fares and tickets#0",
+          "Signalling#0",
+          "Incident report: Harbour Point flood#0",
+          "The Amber Line#1",
+          "Valdane Regional Rail#0"
+        ],
+        "boostedChunks": 6
+      },
+      "graphAugmented": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "The Cobalt Line#0",
+          "Fares and tickets#0",
+          "Signalling#0",
+          "Incident report: Harbour Point flood#0",
+          "The Juniper Line#0",
+          "Governance#0"
+        ],
+        "addedChunks": [
+          "The Juniper Line#0",
+          "Governance#0",
+          "Rolling stock#0",
+          "The Amber Line#0",
+          "Depots and maintenance#0",
+          "Valdane Regional Rail#1"
+        ],
+        "promotedChunks": [
+          "The Juniper Line#0",
+          "Governance#0"
+        ]
+      }
+    },
+    {
+      "id": "p06",
+      "kind": "multi-hop",
+      "question": "In which year was the signalling renewed on the line that calls at Mirel Bridge?",
+      "vectorOnly": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "Signalling#0",
+          "The Amber Line#0",
+          "Valdane Regional Rail#0",
+          "The Juniper Line#0",
+          "The Cobalt Line#0",
+          "Governance#0"
+        ]
+      },
+      "graphExpand": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "Signalling#0",
+          "The Amber Line#0",
+          "Valdane Regional Rail#0",
+          "The Juniper Line#0",
+          "The Cobalt Line#0",
+          "Governance#0"
+        ],
+        "boostedChunks": 6
+      },
+      "graphAugmented": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "Signalling#0",
+          "The Amber Line#0",
+          "Valdane Regional Rail#0",
+          "The Juniper Line#0",
+          "The Cobalt Line#0",
+          "Governance#0"
+        ],
+        "addedChunks": [
+          "Incident report: Harbour Point flood#0",
+          "Depots and maintenance#0",
+          "Valdane Regional Rail#1",
+          "Fares and tickets#0",
+          "Rolling stock#0",
+          "The Amber Line#1"
+        ],
+        "promotedChunks": []
+      }
+    },
+    {
+      "id": "p07",
+      "kind": "multi-hop",
+      "question": "Who chairs the body that approved the Juniper Line track doubling?",
+      "vectorOnly": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "The Juniper Line#0",
+          "Signalling#0",
+          "Governance#0",
+          "Fares and tickets#0",
+          "The Cobalt Line#0",
+          "Valdane Regional Rail#1"
+        ]
+      },
+      "graphExpand": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "The Juniper Line#0",
+          "Signalling#0",
+          "Governance#0",
+          "Fares and tickets#0",
+          "The Cobalt Line#0",
+          "Valdane Regional Rail#1"
+        ],
+        "boostedChunks": 6
+      },
+      "graphAugmented": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "The Juniper Line#0",
+          "Fares and tickets#0",
+          "The Cobalt Line#0",
+          "Valdane Regional Rail#1",
+          "Signalling#0",
+          "Governance#0"
+        ],
+        "addedChunks": [
+          "The Amber Line#0",
+          "Incident report: Harbour Point flood#0",
+          "Valdane Regional Rail#0",
+          "Depots and maintenance#0",
+          "Rolling stock#0",
+          "The Amber Line#1"
+        ],
+        "promotedChunks": []
+      }
+    },
+    {
+      "id": "p08",
+      "kind": "multi-hop",
+      "question": "From which year are the trains on the airport line due to be replaced?",
+      "vectorOnly": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "The Cobalt Line#0",
+          "The Juniper Line#0",
+          "The Amber Line#0",
+          "Valdane Regional Rail#0",
+          "Signalling#0",
+          "Rolling stock#0"
+        ]
+      },
+      "graphExpand": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "The Cobalt Line#0",
+          "The Juniper Line#0",
+          "The Amber Line#0",
+          "Valdane Regional Rail#0",
+          "Signalling#0",
+          "Rolling stock#0"
+        ],
+        "boostedChunks": 6
+      },
+      "graphAugmented": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "The Cobalt Line#0",
+          "The Juniper Line#0",
+          "The Amber Line#0",
+          "Signalling#0",
+          "Valdane Regional Rail#0",
+          "Rolling stock#0"
+        ],
+        "addedChunks": [
+          "Incident report: Harbour Point flood#0",
+          "Governance#0",
+          "Fares and tickets#0",
+          "Depots and maintenance#0",
+          "Valdane Regional Rail#1",
+          "The Amber Line#1"
+        ],
+        "promotedChunks": []
+      }
+    }
+  ]
+}

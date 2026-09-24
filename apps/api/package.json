@@ -12,8 +12,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "eval": "tsx src/eval/cli.ts --json eval/results.json",
-    "eval:check": "tsx src/eval/cli.ts --check eval/results.json"
+    "eval": "tsx src/eval/cli.ts --json eval/results.json && tsx src/eval/cli.ts --json eval/results-postfix.json",
+    "eval:check": "tsx src/eval/cli.ts --check eval/results.json && tsx src/eval/cli.ts --check eval/results-postfix.json"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^1.2.0",
