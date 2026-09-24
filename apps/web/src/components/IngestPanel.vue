@@ -6,7 +6,7 @@ import { useCorpusStore } from '@/stores/corpus';
 import { SAMPLE_PASSAGE, SAMPLE_TITLE } from '@/lib/sampleCorpus';
 
 const corpus = useCorpusStore();
-const { documents, ingesting, progress, error, lastResult, phases, activePhaseIndex } =
+const { documents, ingesting, progress, error, lastResult, phases, activePhaseIndex, readOnly } =
   storeToRefs(corpus);
 
 const title = ref('');
@@ -66,8 +66,17 @@ function formatDate(iso: string): string {
       <span class="text-xs text-slate-500">{{ documents.length }} docs</span>
     </header>
 
+    <p
+      v-if="readOnly"
+      data-testid="read-only-notice"
+      class="rounded-lg border border-[#2a3040] bg-[#11131c] px-3 py-2 text-xs leading-relaxed text-slate-400"
+    >
+      Read-only demo: the corpus is a fictional rail network (10 documents) seeded on start. Ingest
+      and reset are turned off here. Run the app locally to use your own documents.
+    </p>
+
     <!-- Composer -->
-    <div class="flex flex-col gap-2">
+    <div v-else class="flex flex-col gap-2">
       <input
         v-model="title"
         type="text"
@@ -198,6 +207,7 @@ function formatDate(iso: string): string {
     </div>
 
     <button
+      v-if="!readOnly"
       type="button"
       :disabled="ingesting || documents.length === 0"
       class="rounded-lg border px-3 py-2 text-xs font-medium transition disabled:cursor-not-allowed disabled:opacity-40"

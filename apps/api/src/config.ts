@@ -1,5 +1,11 @@
 import { z } from 'zod';
 
+/** "1" or "true" (any case) switches a flag on; anything else, or unset, is off. */
+const EnvFlag = z
+  .string()
+  .optional()
+  .transform((value) => value !== undefined && ['1', 'true'].includes(value.toLowerCase()));
+
 /**
  * Environment configuration, validated with zod at startup.
  *
@@ -12,6 +18,12 @@ const ConfigSchema = z.object({
   LLM_PROVIDER: z.enum(['mock', 'baml']).default('mock'),
   DATA_DIR: z.string().min(1).default('./data'),
   CORS_ORIGIN: z.string().min(1).default('*'),
+  /** Public read-only demo: seed the sample on boot, refuse ingest and delete, rate-limit. */
+  DEMO_READONLY: EnvFlag,
+  /** Requests per client IP per minute; unset means the demo default in read-only mode, off otherwise. */
+  RATE_LIMIT_PER_MINUTE: z.coerce.number().int().positive().optional(),
+  /** Trust X-Forwarded-For for the client IP. Only set it behind a proxy that overwrites the header. */
+  TRUST_PROXY: EnvFlag,
   ANTHROPIC_API_KEY: z.string().optional(),
   OPENAI_API_KEY: z.string().optional(),
 });

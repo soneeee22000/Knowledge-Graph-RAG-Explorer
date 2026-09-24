@@ -32,6 +32,8 @@ export const HealthResponseSchema = z.object({
   llmProvider: z.string(),
   documentCount: z.number().int().nonnegative(),
   entityCount: z.number().int().nonnegative(),
+  /** True on the public read-only demo: ingest and delete are refused. */
+  readOnly: z.boolean().default(false),
 });
 export type HealthResponse = z.infer<typeof HealthResponseSchema>;
 

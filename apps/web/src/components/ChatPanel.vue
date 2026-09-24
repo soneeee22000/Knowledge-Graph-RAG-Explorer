@@ -2,6 +2,8 @@
 import { computed, nextTick, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useChatStore } from '@/stores/chat';
+import { useCorpusStore } from '@/stores/corpus';
+import { suggestionsFor } from '@/lib/suggestions';
 import AgentThoughtTimeline from '@/components/AgentThoughtTimeline.vue';
 import AnswerCard from '@/components/AnswerCard.vue';
 
@@ -13,11 +15,8 @@ const scrollRegion = ref<HTMLElement | null>(null);
 
 const canAsk = computed(() => !running.value && question.value.trim().length > 0);
 
-const suggestions = [
-  'What is Mistral AI and who founded it?',
-  'How does the EU AI Act classify risk?',
-  'How do knowledge graphs improve RAG?',
-];
+const { readOnly } = storeToRefs(useCorpusStore());
+const suggestions = computed(() => suggestionsFor(readOnly.value));
 
 async function submit(): Promise<void> {
   if (!canAsk.value) return;

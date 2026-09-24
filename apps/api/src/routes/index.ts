@@ -14,8 +14,21 @@ import { runRagQuery } from '../agents/ragAgent.js';
 import type { AppStores } from '../services/stores.js';
 
 /** Build an ApiError envelope. */
-function apiError(code: string, message: string): ApiError {
+export function apiError(code: string, message: string): ApiError {
   return { error: { code, message } };
+}
+
+/** Options that change what the routes allow. */
+export interface RouteOptions {
+  readOnly: boolean;
+}
+
+const READ_ONLY_MESSAGE =
+  'This is a read-only public demo: ingesting documents and clearing the corpus are disabled. ' +
+  'Run the app locally (npm run dev) to use your own documents.';
+
+function refuseReadOnly(reply: FastifyReply): void {
+  reply.code(403).send(apiError('read_only_demo', READ_ONLY_MESSAGE));
 }
 
 /**
@@ -48,7 +61,11 @@ function writeSse(reply: FastifyReply, event: unknown): void {
 }
 
 /** Register all `/api` routes against the shared stores. */
-export function registerRoutes(app: FastifyInstance, stores: AppStores): void {
+export function registerRoutes(
+  app: FastifyInstance,
+  stores: AppStores,
+  options: RouteOptions = { readOnly: false },
+): void {
   // GET /api/health ----------------------------------------------------
   app.get('/api/health', async (): Promise<HealthResponse> => {
     return {
@@ -56,6 +73,7 @@ export function registerRoutes(app: FastifyInstance, stores: AppStores): void {
       llmProvider: stores.provider.name,
       documentCount: stores.corpus.documentCount,
       entityCount: stores.graphStore.entityCount,
+      readOnly: options.readOnly,
     };
   });
 
@@ -71,6 +89,10 @@ export function registerRoutes(app: FastifyInstance, stores: AppStores): void {
 
   // POST /api/ingest (SSE) ---------------------------------------------
   app.post('/api/ingest', async (request, reply) => {
+    if (options.readOnly) {
+      refuseReadOnly(reply);
+      return;
+    }
     const parsed = IngestRequestSchema.safeParse(request.body);
     if (!parsed.success) {
       reply.code(400).send(apiError('invalid_request', parsed.error.message));
@@ -110,6 +132,10 @@ export function registerRoutes(app: FastifyInstance, stores: AppStores): void {
 
   // DELETE /api/corpus -------------------------------------------------
   app.delete('/api/corpus', async (_request, reply) => {
+    if (options.readOnly) {
+      refuseReadOnly(reply);
+      return;
+    }
     await stores.clearAll();
     reply.code(204).send();
   });

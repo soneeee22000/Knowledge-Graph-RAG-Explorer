@@ -1,7 +1,12 @@
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 import type { Document, IngestPhase } from '@kg/shared';
-import { getDocuments, resetCorpus as apiResetCorpus, streamIngest } from '@/lib/apiClient';
+import {
+  getDocuments,
+  getHealth,
+  resetCorpus as apiResetCorpus,
+  streamIngest,
+} from '@/lib/apiClient';
 import { useGraphStore } from '@/stores/graph';
 
 export interface IngestProgress {
@@ -14,6 +19,8 @@ const PHASE_ORDER: IngestPhase[] = ['chunking', 'embedding', 'extracting', 'link
 
 export const useCorpusStore = defineStore('corpus', () => {
   const documents = ref<Document[]>([]);
+  /** True when the backend is the public read-only demo (ingest and reset refused). */
+  const readOnly = ref(false);
   const loading = ref(false);
   const ingesting = ref(false);
   const progress = ref<IngestProgress | null>(null);
@@ -37,8 +44,9 @@ export const useCorpusStore = defineStore('corpus', () => {
     loading.value = true;
     error.value = null;
     try {
-      const res = await getDocuments();
+      const [res, health] = await Promise.all([getDocuments(), getHealth()]);
       documents.value = res.documents;
+      readOnly.value = health.readOnly;
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to load documents';
     } finally {
@@ -122,6 +130,7 @@ export const useCorpusStore = defineStore('corpus', () => {
 
   return {
     documents,
+    readOnly,
     loading,
     ingesting,
     progress,
