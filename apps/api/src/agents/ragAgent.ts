@@ -12,7 +12,8 @@ import type {
 } from '@kg/shared';
 import { config } from '../config.js';
 import type { AppStores } from '../services/stores.js';
-import { createRagTools, expandGraph, retrieveContext } from './tools.js';
+import { expandFromCitations, rerankByGraph } from './graphRetrieval.js';
+import { createRagTools, retrieveContext } from './tools.js';
 
 /** Async sink for streamed query events. */
 export type QueryEmit = (event: QueryEvent) => void | Promise<void>;
@@ -195,14 +196,7 @@ export async function runRagQuery(
     const usedRelations: Relation[] = [];
     if (req.useGraphExpansion) {
       const graphStep = await beginStep(emit, 'graph-expand', 'Expanding knowledge graph');
-      // Seed entities = entities whose provenance includes a retrieved chunk.
-      const retrievedChunkIds = new Set(citations.map((c) => c.chunkId));
-      const fullGraph = stores.graphStore.toKnowledgeGraph();
-      const seedIds = fullGraph.entities
-        .filter((e) => e.sourceChunkIds.some((id) => retrievedChunkIds.has(id)))
-        .map((e) => e.id);
-
-      const expanded = expandGraph(stores, seedIds, 1);
+      const expanded = expandFromCitations(stores.graphStore, citations);
       usedEntities.push(...expanded.entities);
       usedRelations.push(...expanded.relations);
 
@@ -222,12 +216,9 @@ export async function runRagQuery(
     let rankedCitations = citations;
     if (req.useGraphExpansion && usedEntities.length > 0) {
       const rerankStep = await beginStep(emit, 'rerank', 'Reranking by graph signal');
-      const GRAPH_BOOST = 0.15;
-      const boostedChunkIds = new Set(usedEntities.flatMap((e) => e.sourceChunkIds));
-      const boosted = (c: (typeof citations)[number]): number =>
-        c.score + (boostedChunkIds.has(c.chunkId) ? GRAPH_BOOST : 0);
-      rankedCitations = [...citations].sort((a, b) => boosted(b) - boosted(a));
-      const boostedCount = citations.filter((c) => boostedChunkIds.has(c.chunkId)).length;
+      const rerank = rerankByGraph(citations, usedEntities);
+      rankedCitations = rerank.ranked;
+      const boostedCount = rerank.boostedCount;
       await emit({ type: 'retrieved', citations: rankedCitations });
       await endStep(
         emit,
