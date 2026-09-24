@@ -74,8 +74,11 @@ Selected by `LLM_PROVIDER` via the factory in `src/llm/index.ts`.
 `kg-rag-explorer` with instructions describing the
 plan → retrieve → graph-expand → rerank → synthesize flow, and registers two real
 `createTool` tools (`src/agents/tools.ts`): `retrieve` and `graphExpand`. The
-tools' `execute` and the pipeline call the **same** shared functions
-(`retrieveContext`, `expandGraph`), so the tools are never decorative.
+`retrieve` tool and the pipeline both call `retrieveContext`; the `graphExpand`
+tool (`expandGraph`) and the pipeline (`expandFromCitations` in
+`src/agents/graphRetrieval.ts`) both walk `graphStore.neighbors`. With a key, the
+agent writes only the plan step: retrieval, expansion, rerank and synthesis still
+run in `runRagQuery`.
 
 - **With a key** (`LLM_PROVIDER=baml` + `ANTHROPIC_API_KEY`): a real Anthropic
   model is bound and `agent.generate(...)` is genuinely invoked to produce the

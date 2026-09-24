@@ -5,7 +5,7 @@ import { AnswerSchema, CitationSchema, EntitySchema, RelationSchema } from './do
  * Streaming protocol contracts.
  *
  * The agent's "thought process" is streamed to the UI over SSE so that the
- * reasoning is transparent and intuitive (the JD's core requirement). Every
+ * reasoning is visible step by step. Every
  * event is a discriminated union member keyed by `type`, so the frontend can
  * exhaustively switch over them with full type safety.
  */

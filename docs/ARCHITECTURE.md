@@ -23,7 +23,7 @@ re-exported with its inferred TypeScript type:
 
 Because both the Node backend and the Vue frontend import these schemas, the
 "agent ↔ human" contract is enforced at runtime (validation) and compile time
-(types). This is the JD's "robust schema contracts" requirement made literal.
+(types).
 
 ### `packages/baml` — typed LLM integration
 
@@ -79,12 +79,17 @@ All streaming uses SSE frames (`data: <json>\n\n`) serialized through
 3. Emits `retrieved` (citations) + `thought(retrieve)`.
 4. Maps hits to entities, expands neighbors → emits `graph` + `thought(graph-expand)`.
    The frontend pushes these into the graph store and highlights them.
-5. Builds context, calls `provider.answer`, streams `token`s, emits final
+   (`agents/graphRetrieval.ts`)
+5. Reranks the retrieved chunks: a chunk that contributed an expanded entity gains
+   `GRAPH_BOOST` (0.15). This only reorders the top-k; it never adds a chunk.
+   Emits `retrieved` again + `thought(rerank)`. On the authored eval set every
+   retrieved chunk is boosted, so the order never changes: see [EVAL.md](EVAL.md).
+6. Builds context, calls `provider.answer`, streams `token`s, emits final
    `answer`, then `done`.
 
 ## Why offline-first
 
 A portfolio repo must run on `git clone && npm install` with no secrets. The mock
 provider produces a genuinely non-trivial graph and grounded extractive answers,
-so reviewers see the full experience immediately; real models are one env var
+so the full UI flow can be tried immediately; real models are one env var
 away.
