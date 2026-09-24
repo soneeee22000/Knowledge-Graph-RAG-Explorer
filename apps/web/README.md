@@ -67,7 +67,7 @@ src/
 - `GET /api/graph` → `KnowledgeGraph`
 - `POST /api/ingest` → SSE stream of `IngestEvent` (body `IngestRequest`)
 - `POST /api/query` → SSE stream of `QueryEvent` (body `QueryRequest`)
-- `DELETE /api/corpus` → 204
+- `DELETE /api/corpus` → 204 (403 on the read-only demo, where `/api/health` reports `readOnly: true` and the ingest form and reset button are hidden)
 
 SSE frames are `data: <json>\n\n`; POST streams are read via
 `fetch().body.getReader()` + `TextDecoder`, buffered, split on `\n\n`, and

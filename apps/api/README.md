@@ -74,9 +74,11 @@ Selected by `LLM_PROVIDER` via the factory in `src/llm/index.ts`.
 `kg-rag-explorer` with instructions describing the
 plan → retrieve → graph-expand → rerank → synthesize flow, and registers two real
 `createTool` tools (`src/agents/tools.ts`): `retrieve` and `graphExpand`. The
-`retrieve` tool and the pipeline both call `retrieveContext`; the `graphExpand`
-tool (`expandGraph`) and the pipeline (`expandFromCitations` in
-`src/agents/graphRetrieval.ts`) both walk `graphStore.neighbors`. With a key, the
+`retrieve` tool calls `retrieveContext`, which ranks chunks the same way as the
+pipeline's `retrieveWithGraph`. The `graphExpand` tool (`expandGraph`) walks
+`graphStore.neighbors`; the pipeline's graph step is `augmentWithGraph` in
+`src/agents/graphRetrieval.ts`, which adds graph-reached chunks to the candidates
+and reranks them (see `docs/EVAL.md`). With a key, the
 agent writes only the plan step: retrieval, expansion, rerank and synthesis still
 run in `runRagQuery`.
 
@@ -93,18 +95,24 @@ run in `runRagQuery`.
 All request/response/event shapes come from `@kg/shared` (the single source of
 truth). SSE frames are serialized with `toSseFrame`.
 
-| Method & path        | Body            | Response                                                                   |
-| -------------------- | --------------- | -------------------------------------------------------------------------- |
-| `GET /api/health`    | —               | `HealthResponse` `{status, llmProvider, documentCount, entityCount}`       |
-| `GET /api/documents` | —               | `DocumentListResponse`                                                     |
-| `GET /api/graph`     | —               | `KnowledgeGraph` (full current graph)                                      |
-| `POST /api/ingest`   | `IngestRequest` | **SSE** stream of `IngestEvent` (progress…/complete or error)              |
-| `POST /api/query`    | `QueryRequest`  | **SSE** stream of `QueryEvent` (thought/retrieved/graph/token/answer/done) |
-| `DELETE /api/corpus` | —               | `204`; clears all stores + persisted JSON files                            |
+| Method & path        | Body            | Response                                                                       |
+| -------------------- | --------------- | ------------------------------------------------------------------------------ |
+| `GET /api/health`    | —               | `HealthResponse` `{status, llmProvider, documentCount, entityCount, readOnly}` |
+| `GET /api/documents` | —               | `DocumentListResponse`                                                         |
+| `GET /api/graph`     | —               | `KnowledgeGraph` (full current graph)                                          |
+| `POST /api/ingest`   | `IngestRequest` | **SSE** stream of `IngestEvent` (progress…/complete or error)                  |
+| `POST /api/query`    | `QueryRequest`  | **SSE** stream of `QueryEvent` (thought/retrieved/graph/token/answer/done)     |
+| `DELETE /api/corpus` | —               | `204`; clears all stores + persisted JSON files (`403` in read-only mode)      |
 
 SSE responses set `Content-Type: text/event-stream`, `Cache-Control: no-cache`,
 `Connection: keep-alive`, and flush per frame. Invalid bodies return `400` with
 an `ApiError` envelope.
+
+With `DEMO_READONLY=1` the API seeds the committed rail sample
+(`eval/corpus.json`) on boot, `POST /api/ingest` and `DELETE /api/corpus` return
+`403` (`read_only_demo`), and every route except `/api/health` is rate-limited per
+client IP (`RATE_LIMIT_PER_MINUTE`, default 60 in this mode; `429` with
+`Retry-After`). `TRUST_PROXY=1` reads the client IP from `X-Forwarded-For`.
 
 ### Examples
 
@@ -134,7 +142,10 @@ src/
   routes/index.ts      # REST + SSE routes (/api)
   llm/                 # provider interface, mock, baml, factory
   services/            # chunker, vectorStore, graphStore, corpus, stores
-  agents/              # Mastra agent + tools + runRagQuery pipeline
+  agents/              # Mastra agent + tools + runRagQuery pipeline + graph-augmented retrieval
+  demo/                # read-only demo: sample seeding, per-IP rate limiter
+  vercel.ts            # Node handler for the Vercel Function (always read-only)
+  eval/                # retrieval evaluation (see docs/EVAL.md)
 ```
 
 Persisted artifacts live in `DATA_DIR` and are gitignored at the repo root.

@@ -77,13 +77,17 @@ All streaming uses SSE frames (`data: <json>\n\n`) serialized through
 1. UI `POST /api/query` with `{ question, topK, useGraphExpansion }`.
 2. API emits `thought(plan)` → embeds the question → vector search.
 3. Emits `retrieved` (citations) + `thought(retrieve)`.
-4. Maps hits to entities, expands neighbors → emits `graph` + `thought(graph-expand)`.
-   The frontend pushes these into the graph store and highlights them.
-   (`agents/graphRetrieval.ts`)
-5. Reranks the retrieved chunks: a chunk that contributed an expanded entity gains
-   `GRAPH_BOOST` (0.15). This only reorders the top-k; it never adds a chunk.
-   Emits `retrieved` again + `thought(rerank)`. On the authored eval set every
-   retrieved chunk is boosted, so the order never changes: see [EVAL.md](EVAL.md).
+4. Graph expansion (`augmentWithGraph`): seed entities from the top 3 vector
+   chunks, walked one hop out. Every chunk that mentions a reached entity joins
+   the candidates, including chunks outside the vector top-k. Emits `graph` +
+   `thought(graph-expand)`.
+5. Reranks the union by vector score + graph support (seed score x 0.5^hop / the
+   number of chunks mentioning the entity, max per chunk), ties by vector rank,
+   and cuts to top-k. Emits `retrieved` again + `thought(rerank)`, naming how many
+   chunks the graph added and how many made the cut. On the authored eval sets this
+   changes the top-k but does not improve the metrics: see [EVAL.md](EVAL.md).
+   The original reorder-only rerank (`rerankByGraph`) is kept only so the eval can
+   keep reproducing its null result.
 6. Builds context, calls `provider.answer`, streams `token`s, emits final
    `answer`, then `done`.
 
