@@ -1,0 +1,188 @@
+{
+  "name": "valdane-rail-retrieval-v1",
+  "author": "Pyae Sone (Seon), repo author",
+  "note": "Authored for this repo, not a public benchmark. Twenty questions over the fictional corpus in corpus.json, written before any results were generated. single-hop: the answer sits in one chunk that shares words with the question. multi-hop: the answer needs a second chunk reached through a bridging entity (for example a train series) that the question does not name.",
+  "topK": 6,
+  "items": [
+    {
+      "id": "s01",
+      "kind": "single-hop",
+      "question": "Who chairs the board of the Valdane Transport Authority?",
+      "evidence": [{ "document": "Governance", "contains": "chaired by Ilse Moravec" }]
+    },
+    {
+      "id": "s02",
+      "kind": "single-hop",
+      "question": "When did the Amber Line open in its current form?",
+      "evidence": [
+        { "document": "The Amber Line", "contains": "opened in its current form in 2011" }
+      ]
+    },
+    {
+      "id": "s03",
+      "kind": "single-hop",
+      "question": "What smart card do passengers use to pay fares?",
+      "evidence": [
+        { "document": "Fares and tickets", "contains": "Tallypass, a contactless smart card" }
+      ]
+    },
+    {
+      "id": "s04",
+      "kind": "single-hop",
+      "question": "Which company manages Tallypass?",
+      "evidence": [
+        {
+          "document": "Fares and tickets",
+          "contains": "managed by a company called Meridia Payments"
+        }
+      ]
+    },
+    {
+      "id": "s05",
+      "kind": "single-hop",
+      "question": "How many passengers does a Series 22 unit seat?",
+      "evidence": [{ "document": "Rolling stock", "contains": "seat 260 passengers" }]
+    },
+    {
+      "id": "s06",
+      "kind": "single-hop",
+      "question": "Where is the head office of Valdane Regional Rail?",
+      "evidence": [
+        { "document": "Valdane Regional Rail", "contains": "head office is in Port Istra" }
+      ]
+    },
+    {
+      "id": "s07",
+      "kind": "single-hop",
+      "question": "What flooded at Harbour Point station in October 2024?",
+      "evidence": [
+        {
+          "document": "Incident report: Harbour Point flood",
+          "contains": "flooded the underpass at Harbour Point"
+        }
+      ]
+    },
+    {
+      "id": "s08",
+      "kind": "single-hop",
+      "question": "Which company replaced the signalling on the Amber Line?",
+      "evidence": [
+        { "document": "Signalling", "contains": "replaced in 2016 by Northgate Systems" }
+      ]
+    },
+    {
+      "id": "s09",
+      "kind": "single-hop",
+      "question": "Which contractor re-profiles the wheels of Series 22 trains?",
+      "evidence": [{ "document": "Depots and maintenance", "contains": "Fairlie Engineering" }]
+    },
+    {
+      "id": "s10",
+      "kind": "single-hop",
+      "question": "What is the journey time on the Cobalt Line?",
+      "evidence": [{ "document": "The Cobalt Line", "contains": "journey time of 17 minutes" }]
+    },
+    {
+      "id": "m01",
+      "kind": "multi-hop",
+      "question": "Which company builds the trains that run on the Amber Line?",
+      "evidence": [
+        { "document": "The Amber Line", "contains": "operated with Series 40 trains" },
+        { "document": "Rolling stock", "contains": "built by Corvel Works" }
+      ]
+    },
+    {
+      "id": "m02",
+      "kind": "multi-hop",
+      "question": "At which depot are the Amber Line trains overhauled?",
+      "evidence": [
+        { "document": "The Amber Line", "contains": "operated with Series 40 trains" },
+        {
+          "document": "Depots and maintenance",
+          "contains": "Brennock Depot, beside the Corvel Works factory"
+        }
+      ]
+    },
+    {
+      "id": "m03",
+      "kind": "multi-hop",
+      "question": "Who manufactured the trains used on the Juniper Line?",
+      "evidence": [
+        { "document": "The Juniper Line", "contains": "uses Series 22 trains" },
+        { "document": "Rolling stock", "contains": "built by Hallam Rolling Stock" }
+      ]
+    },
+    {
+      "id": "m04",
+      "kind": "multi-hop",
+      "question": "Which depot services the trains of the Cobalt Line?",
+      "evidence": [
+        { "document": "The Cobalt Line", "contains": "uses Series 22 trains" },
+        { "document": "Depots and maintenance", "contains": "services the Series 22 fleet" }
+      ]
+    },
+    {
+      "id": "m05",
+      "kind": "multi-hop",
+      "question": "Who chairs the body that owns Valdane Regional Rail?",
+      "evidence": [
+        {
+          "document": "Valdane Regional Rail",
+          "contains": "owned by the Valdane Transport Authority"
+        },
+        { "document": "Governance", "contains": "chaired by Ilse Moravec" }
+      ]
+    },
+    {
+      "id": "m06",
+      "kind": "multi-hop",
+      "question": "How fast must a technician reach a signalling fault at Harbour Point?",
+      "evidence": [
+        { "document": "The Amber Line", "contains": "calling at Harbour Point" },
+        {
+          "document": "Signalling",
+          "contains": "reach any Amber Line signalling fault within 45 minutes"
+        }
+      ]
+    },
+    {
+      "id": "m07",
+      "kind": "multi-hop",
+      "question": "How many passengers can each Amber Line train seat?",
+      "evidence": [
+        { "document": "The Amber Line", "contains": "operated with Series 40 trains" },
+        { "document": "Rolling stock", "contains": "seats 420 passengers" }
+      ]
+    },
+    {
+      "id": "m08",
+      "kind": "multi-hop",
+      "question": "Who built the trains that were held at Kestrel Hill during the Harbour Point flood?",
+      "evidence": [
+        { "document": "Incident report: Harbour Point flood", "contains": "held at Kestrel Hill" },
+        { "document": "Rolling stock", "contains": "built by Corvel Works" }
+      ]
+    },
+    {
+      "id": "m09",
+      "kind": "multi-hop",
+      "question": "Who approved the track doubling on the line with the worst punctuality?",
+      "evidence": [
+        { "document": "Valdane Regional Rail", "contains": "had the worst punctuality" },
+        {
+          "document": "The Juniper Line",
+          "contains": "approved by the Valdane Transport Authority in 2023"
+        }
+      ]
+    },
+    {
+      "id": "m10",
+      "kind": "multi-hop",
+      "question": "What kind of signalling does the line to the airport use?",
+      "evidence": [
+        { "document": "The Cobalt Line", "contains": "airport at Varn Field" },
+        { "document": "Signalling", "contains": "older relay-based signalling" }
+      ]
+    }
+  ]
+}

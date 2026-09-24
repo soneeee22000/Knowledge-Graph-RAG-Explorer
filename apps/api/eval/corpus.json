@@ -1,0 +1,46 @@
+{
+  "name": "valdane-rail",
+  "note": "Fictional corpus about an invented regional rail network. Every name, date and number is made up for this evaluation. Written by the repo author.",
+  "documents": [
+    {
+      "title": "Valdane Regional Rail",
+      "content": "Valdane Regional Rail is the public operator of passenger trains across the Valdane region. It runs three lines: the Amber Line, the Cobalt Line and the Juniper Line. The operator is owned by the Valdane Transport Authority, which sets fares and approves the annual timetable. Its head office is in Port Istra, next to the central station. Valdane Regional Rail was formed in 1998 when two older companies, Istra Coastal Railways and the Kestrel Valley Railway, merged. Today it employs about 2,300 people, most of them drivers, conductors and depot staff. The operator publishes a punctuality report every quarter. In its most recent report the Juniper Line had the worst punctuality of the three lines, because of single-track sections between Orlen and Saltmere."
+    },
+    {
+      "title": "The Amber Line",
+      "content": "The Amber Line is the busiest line of Valdane Regional Rail. It runs from Port Istra to Kestrel Hill, calling at Harbour Point, Mirel Bridge and Ostwick. The line opened in its current form in 2011, after the tunnel under Mirel Bridge was widened. Trains on the Amber Line run every ten minutes at peak times and every twenty minutes in the evening. All Amber Line services are operated with Series 40 trains. Harbour Point is the only station on the line with step-free access from the street to every platform. Kestrel Hill, the northern terminus, has a park-and-ride with 900 spaces. The journey from Port Istra to Kestrel Hill takes 38 minutes."
+    },
+    {
+      "title": "The Cobalt Line",
+      "content": "The Cobalt Line links Port Istra with the airport at Varn Field. It is the shortest line on the network, with four stations and a journey time of 17 minutes. The Cobalt Line uses Series 22 trains, which have extra luggage racks for air passengers. Services run every fifteen minutes from 05:00 until midnight. The Cobalt Line was extended to Varn Field in 2019; before that it ended at Dunmore Road. Because the airport is outside the Tallypass zone, a supplement is charged on every journey to Varn Field."
+    },
+    {
+      "title": "The Juniper Line",
+      "content": "The Juniper Line is a rural line running west from Ostwick through Orlen to the coastal town of Saltmere. Much of the Juniper Line is single track, so trains can only pass each other at Orlen and at the Fenwick loop. Services run every hour. The line uses Series 22 trains, the same fleet as the Cobalt Line. A plan to double the track between Orlen and Saltmere was approved by the Valdane Transport Authority in 2023, with construction expected to start in 2026. The Juniper Line carries many school students in the morning, and extra trains are added during term time."
+    },
+    {
+      "title": "Rolling stock",
+      "content": "The network uses two train fleets. The Series 40 is an electric train built by Corvel Works, a manufacturer based in the town of Brennock. Thirty-two Series 40 units were delivered between 2010 and 2012. Each unit has six carriages and seats 420 passengers. The Series 22 is an older, smaller fleet built by Hallam Rolling Stock in 1996. Series 22 units have four carriages and seat 260 passengers. Series 22 trains are due to be replaced from 2027, and the operator has asked manufacturers for bids. Corvel Works also holds the maintenance contract for the Series 40 fleet until 2030."
+    },
+    {
+      "title": "Depots and maintenance",
+      "content": "Trains are maintained at two depots. Brennock Depot, beside the Corvel Works factory, carries out heavy maintenance on the whole Series 40 fleet, including wheel re-profiling and bogie overhauls. Saltmere Depot is a smaller site that services the Series 22 fleet. Saltmere Depot has no wheel lathe, so Series 22 wheels are sent by road to a contractor, Fairlie Engineering, for re-profiling. Every train is inspected every 72 hours. The depot managers report to the operator's head of engineering, Tomas Reyne."
+    },
+    {
+      "title": "Signalling",
+      "content": "Signalling on the Amber Line was replaced in 2016 by Northgate Systems, which installed a computer-based interlocking controlled from the Port Istra control centre. The new signalling allowed the ten-minute peak frequency. The Cobalt Line and the Juniper Line still use older relay-based signalling from the 1980s. The Valdane Transport Authority has budgeted for a signalling renewal on the Juniper Line as part of the track-doubling project. Northgate Systems has a support contract that requires a technician to reach any Amber Line signalling fault within 45 minutes."
+    },
+    {
+      "title": "Fares and tickets",
+      "content": "Fares are set by the Valdane Transport Authority. Most passengers pay with Tallypass, a contactless smart card that can be topped up at stations or online. A daily cap limits the amount a Tallypass holder pays in one day. Students under 19 travel at half fare with a Tallypass registered to their school. Paper tickets are still sold at staffed stations, but they cost more than the Tallypass fare. Tallypass was introduced in 2015 and is managed by a company called Meridia Payments."
+    },
+    {
+      "title": "Governance",
+      "content": "The Valdane Transport Authority is the public body responsible for transport in the region. Its board is chaired by Ilse Moravec, who was appointed in 2021. The authority owns Valdane Regional Rail, sets fares, and funds major projects such as the Juniper Line track doubling. It also regulates bus operators in the region. The authority's annual budget is approved by the Valdane Regional Council. Board meetings are held in public every two months in Port Istra."
+    },
+    {
+      "title": "Incident report: Harbour Point flood",
+      "content": "In October 2024, heavy rain flooded the underpass at Harbour Point station. The Amber Line was closed between Port Istra and Mirel Bridge for two days while pumps cleared the water. Replacement buses ran between the closed stations. An internal review found that a drainage pump had failed because it had not been serviced on schedule. The review recommended that the pump contract move to the same maintenance schedule as the station lifts. No trains were damaged, and the Series 40 units were held at Kestrel Hill during the closure."
+    }
+  ]
+}
