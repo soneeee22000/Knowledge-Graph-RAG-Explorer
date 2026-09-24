@@ -6,7 +6,7 @@ import {
   RESULTS_FILE,
 } from './dataset.js';
 import type { Summary } from './metrics.js';
-import type { EvalReport, ModeSummary } from './retrievalEval.js';
+import type { EvalReport, ModeComparison, ModeSummary } from './retrievalEval.js';
 
 const JSON_INDENT = 2;
 const MRR_DISPLAY_DECIMALS = 3;
@@ -72,6 +72,26 @@ export function formatSummaryTable(report: EvalReport): string {
       ? modeRows('graph-augmented', report.summary.graphAugmented)
       : []),
   ].join('\n');
+}
+
+function comparisonLine(label: string, c: ModeComparison): string {
+  return (
+    `${label} vs vector-only: first-relevant rank improved on ${c.improved}, ` +
+    `worsened on ${c.worsened}, unchanged on ${c.unchanged}; ` +
+    `top-k order changed on ${c.orderChanged}` +
+    (c.membershipChanged === undefined
+      ? '.'
+      : `; top-k membership changed on ${c.membershipChanged}.`)
+  );
+}
+
+/** One line per graph mode comparing its first-relevant rank and top-k with vector-only. */
+export function formatComparisonLines(report: EvalReport): string[] {
+  const lines = [comparisonLine('Graph-expand (v1)', report.comparison)];
+  if (report.comparisonAugmented) {
+    lines.push(comparisonLine('Graph-augmented (v2)', report.comparisonAugmented));
+  }
+  return lines;
 }
 
 /** Stable JSON text for the committed results file. */

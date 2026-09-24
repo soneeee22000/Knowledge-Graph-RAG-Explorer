@@ -63,7 +63,10 @@ export interface ModeComparison {
   improved: number;
   worsened: number;
   unchanged: number;
+  /** Questions whose top-k list differs from vector-only in order or membership. */
   orderChanged: number;
+  /** Questions whose top-k chunk set differs from vector-only (a chunk came in or went out). */
+  membershipChanged?: number;
 }
 
 /**
@@ -97,7 +100,8 @@ type FullItemReport = Required<ItemReport>;
 export interface FullEvalReport extends EvalReport {
   config: Required<EvalReport['config']>;
   summary: Required<EvalReport['summary']>;
-  comparisonAugmented: ModeComparison;
+  comparison: Required<ModeComparison>;
+  comparisonAugmented: Required<ModeComparison>;
   items: FullItemReport[];
 }
 
@@ -192,17 +196,22 @@ function compareModes(
   items: FullItemReport[],
   topK: number,
   pick: (i: FullItemReport) => ModeResult,
-): ModeComparison {
+): Required<ModeComparison> {
   const delta = (i: FullItemReport): number =>
     rankValue(i.vectorOnly.rank, topK) - rankValue(pick(i).rank, topK);
   const orderChanged = items.filter(
     (i) => i.vectorOnly.retrieved.join('|') !== pick(i).retrieved.join('|'),
+  ).length;
+  const asSet = (retrieved: string[]): string => [...retrieved].sort().join('|');
+  const membershipChanged = items.filter(
+    (i) => asSet(i.vectorOnly.retrieved) !== asSet(pick(i).retrieved),
   ).length;
   return {
     improved: items.filter((i) => delta(i) > 0).length,
     worsened: items.filter((i) => delta(i) < 0).length,
     unchanged: items.filter((i) => delta(i) === 0).length,
     orderChanged,
+    membershipChanged,
   };
 }
 

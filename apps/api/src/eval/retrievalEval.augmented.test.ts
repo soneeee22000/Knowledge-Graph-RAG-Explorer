@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { GRAPH_SUPPORT_WEIGHT, HOP_DECAY, SEED_CHUNK_COUNT } from '../agents/graphRetrieval.js';
-import { formatSummaryTable } from './cliSupport.js';
+import { formatComparisonLines, formatSummaryTable } from './cliSupport.js';
 import type { Corpus, EvalSet } from './dataset.js';
 import { runRetrievalEval } from './retrievalEval.js';
 
@@ -81,5 +81,29 @@ describe('runRetrievalEval graph-augmented mode', () => {
   it('prints graph-augmented rows in the summary table', async () => {
     const report = await runRetrievalEval(corpus, evalSet);
     expect(formatSummaryTable(report)).toContain('| graph-augmented | all | 2 |');
+  });
+});
+
+describe('runRetrievalEval top-k membership', () => {
+  it('counts questions whose top-k chunk set changed, separately from order-only changes', async () => {
+    const report = await runRetrievalEval(corpus, evalSet);
+    const sameSet = (a: string[], b: string[]): boolean =>
+      [...a].sort().join('|') === [...b].sort().join('|');
+    const expected = report.items.filter(
+      (i) => !sameSet(i.vectorOnly.retrieved, i.graphAugmented.retrieved),
+    ).length;
+    expect(expected).toBeGreaterThan(0);
+    expect(report.comparisonAugmented.membershipChanged).toBe(expected);
+    expect(report.comparison.membershipChanged).toBe(0);
+    expect(report.comparisonAugmented.membershipChanged).toBeLessThanOrEqual(
+      report.comparisonAugmented.orderChanged,
+    );
+  });
+
+  it('prints order and membership changes as separate numbers', async () => {
+    const report = await runRetrievalEval(corpus, evalSet);
+    expect(formatComparisonLines(report).join('\n')).toMatch(
+      /top-k order changed on \d+; top-k membership changed on \d+/,
+    );
   });
 });

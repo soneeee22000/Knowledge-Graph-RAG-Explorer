@@ -1,5 +1,6 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import {
+  formatComparisonLines,
   formatSummaryTable,
   parseCliArgs,
   questionsFileFor,
@@ -10,26 +11,14 @@ import { EVAL_DIR, loadCorpus, loadEvalSet } from './dataset.js';
 import { runRetrievalEval, type EvalReport } from './retrievalEval.js';
 
 function printReport(report: EvalReport): void {
-  const { corpus, config, comparison, comparisonAugmented } = report;
+  const { corpus, config } = report;
   console.log(
     `Retrieval eval (${report.evalSet.name}): ${report.evalSet.items} questions over ${corpus.documents} documents ` +
       `(${corpus.chunks} chunks, ${corpus.entities} entities, ${corpus.relations} relations), ` +
       `provider=${config.provider}, topK=${config.topK}\n`,
   );
   console.log(formatSummaryTable(report));
-  console.log(
-    `\nGraph rerank vs vector order: first-relevant rank improved on ${comparison.improved}, ` +
-      `worsened on ${comparison.worsened}, unchanged on ${comparison.unchanged}; ` +
-      `top-k order changed on ${comparison.orderChanged}.`,
-  );
-  if (comparisonAugmented) {
-    console.log(
-      `Graph-augmented vs vector order: first-relevant rank improved on ` +
-        `${comparisonAugmented.improved}, worsened on ${comparisonAugmented.worsened}, ` +
-        `unchanged on ${comparisonAugmented.unchanged}; top-k changed on ` +
-        `${comparisonAugmented.orderChanged}.`,
-    );
-  }
+  console.log(`\n${formatComparisonLines(report).join('\n')}`);
 }
 
 async function checkAgainst(path: string, text: string): Promise<boolean> {

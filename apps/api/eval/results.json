@@ -119,13 +119,15 @@
     "improved": 0,
     "worsened": 0,
     "unchanged": 20,
-    "orderChanged": 0
+    "orderChanged": 0,
+    "membershipChanged": 0
   },
   "comparisonAugmented": {
     "improved": 0,
     "worsened": 1,
     "unchanged": 19,
-    "orderChanged": 17
+    "orderChanged": 17,
+    "membershipChanged": 12
   },
   "items": [
     {
