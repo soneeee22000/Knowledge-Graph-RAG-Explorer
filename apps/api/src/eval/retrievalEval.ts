@@ -5,10 +5,13 @@ import type { Citation } from '@kg/shared';
 import {
   EXPANSION_DEPTH,
   GRAPH_BOOST,
+  GRAPH_SUPPORT_WEIGHT,
+  HOP_DECAY,
+  SEED_CHUNK_COUNT,
   expandFromCitations,
   rerankByGraph,
 } from '../agents/graphRetrieval.js';
-import { retrieveContext } from '../agents/tools.js';
+import { retrieveWithGraph, type GraphRetrievalResult } from '../agents/tools.js';
 import { MockLlmProvider } from '../llm/mock.js';
 import { AppStores } from '../services/stores.js';
 import type { Corpus, EvalItem, EvalSet, ItemKind } from './dataset.js';
@@ -29,12 +32,26 @@ export interface ModeResult extends ItemScore {
   retrieved: string[];
 }
 
+/** The graph-augmented mode also records which chunks the graph added. */
+export interface AugmentedModeResult extends ModeResult {
+  /** Chunks outside the vector top-k that expansion added to the candidate union. */
+  addedChunks: string[];
+  /** Added chunks that made the final top-k. */
+  promotedChunks: string[];
+}
+
+/**
+ * `graphExpand` is the original graph step (v1): expand, then reorder the
+ * vector top-k only. `graphAugmented` is the current pipeline step (v2):
+ * expansion adds candidates, the union is reranked and cut to k.
+ */
 export interface ItemReport {
   id: string;
   kind: ItemKind;
   question: string;
   vectorOnly: ModeResult;
   graphExpand: ModeResult & { boostedChunks: number };
+  graphAugmented?: AugmentedModeResult;
 }
 
 export interface ModeSummary {
@@ -42,14 +59,46 @@ export interface ModeSummary {
   byKind: Partial<Record<ItemKind, Summary>>;
 }
 
-/** The full, deterministic evaluation report written to results.json. */
+export interface ModeComparison {
+  improved: number;
+  worsened: number;
+  unchanged: number;
+  orderChanged: number;
+}
+
+/**
+ * Evaluation report written to results.json. The graph-augmented fields are
+ * optional in this shape so v1-only reports still type-check;
+ * `runRetrievalEval` always fills them (see `FullEvalReport`).
+ */
 export interface EvalReport {
   evalSet: { name: string; author: string; items: number };
   corpus: { name: string; documents: number; chunks: number; entities: number; relations: number };
-  config: { provider: string; topK: number; graphBoost: number; expansionDepth: number };
-  summary: { vectorOnly: ModeSummary; graphExpand: ModeSummary };
-  comparison: { improved: number; worsened: number; unchanged: number; orderChanged: number };
+  config: {
+    provider: string;
+    topK: number;
+    graphBoost: number;
+    expansionDepth: number;
+    seedChunkCount?: number;
+    hopDecay?: number;
+    graphSupportWeight?: number;
+  };
+  summary: { vectorOnly: ModeSummary; graphExpand: ModeSummary; graphAugmented?: ModeSummary };
+  /** v1 graph-expand vs vector-only. */
+  comparison: ModeComparison;
+  /** v2 graph-augmented vs vector-only. */
+  comparisonAugmented?: ModeComparison;
   items: ItemReport[];
+}
+
+type FullItemReport = Required<ItemReport>;
+
+/** The report `runRetrievalEval` produces: every mode present. */
+export interface FullEvalReport extends EvalReport {
+  config: Required<EvalReport['config']>;
+  summary: Required<EvalReport['summary']>;
+  comparisonAugmented: ModeComparison;
+  items: FullItemReport[];
 }
 
 type ChunkLookup = Map<string, RankedChunk>;
@@ -86,13 +135,31 @@ function scoreMode(citations: Citation[], item: EvalItem, lookup: ChunkLookup): 
   };
 }
 
+function scoreAugmented(
+  retrieval: GraphRetrievalResult,
+  item: EvalItem,
+  lookup: ChunkLookup,
+): AugmentedModeResult {
+  const name = (chunkId: string): string => {
+    const chunk = lookup.get(chunkId);
+    return chunk ? `${chunk.documentTitle}#${chunk.chunkIndex}` : chunkId;
+  };
+  const { addedChunkIds, promotedChunkIds } = retrieval.augmentation;
+  return {
+    ...scoreMode(retrieval.citations, item, lookup),
+    addedChunks: addedChunkIds.map(name),
+    promotedChunks: promotedChunkIds.map(name),
+  };
+}
+
 async function scoreItem(
   stores: AppStores,
   item: EvalItem,
   topK: number,
   lookup: ChunkLookup,
-): Promise<ItemReport> {
-  const citations = await retrieveContext(stores, item.question, topK);
+): Promise<FullItemReport> {
+  const retrieval = await retrieveWithGraph(stores, item.question, topK);
+  const citations = retrieval.vectorCitations;
   const expanded = expandFromCitations(stores.graphStore, citations);
   const rerank = rerankByGraph(citations, expanded.entities);
   return {
@@ -101,10 +168,14 @@ async function scoreItem(
     question: item.question,
     vectorOnly: scoreMode(citations, item, lookup),
     graphExpand: { ...scoreMode(rerank.ranked, item, lookup), boostedChunks: rerank.boostedCount },
+    graphAugmented: scoreAugmented(retrieval, item, lookup),
   };
 }
 
-function summarizeMode(items: ItemReport[], pick: (i: ItemReport) => ModeResult): ModeSummary {
+function summarizeMode(
+  items: FullItemReport[],
+  pick: (i: FullItemReport) => ModeResult,
+): ModeSummary {
   const byKind: Partial<Record<ItemKind, Summary>> = {};
   for (const kind of ITEM_KINDS) {
     const subset = items.filter((i) => i.kind === kind);
@@ -117,11 +188,15 @@ function rankValue(rank: number | null, topK: number): number {
   return rank ?? topK + 1;
 }
 
-function compareModes(items: ItemReport[], topK: number): EvalReport['comparison'] {
-  const delta = (i: ItemReport): number =>
-    rankValue(i.vectorOnly.rank, topK) - rankValue(i.graphExpand.rank, topK);
+function compareModes(
+  items: FullItemReport[],
+  topK: number,
+  pick: (i: FullItemReport) => ModeResult,
+): ModeComparison {
+  const delta = (i: FullItemReport): number =>
+    rankValue(i.vectorOnly.rank, topK) - rankValue(pick(i).rank, topK);
   const orderChanged = items.filter(
-    (i) => i.vectorOnly.retrieved.join('|') !== i.graphExpand.retrieved.join('|'),
+    (i) => i.vectorOnly.retrieved.join('|') !== pick(i).retrieved.join('|'),
   ).length;
   return {
     improved: items.filter((i) => delta(i) > 0).length,
@@ -135,8 +210,8 @@ function buildReport(
   stores: AppStores,
   corpus: Corpus,
   evalSet: EvalSet,
-  items: ItemReport[],
-): EvalReport {
+  items: FullItemReport[],
+): FullEvalReport {
   return {
     evalSet: { name: evalSet.name, author: evalSet.author, items: items.length },
     corpus: {
@@ -151,28 +226,34 @@ function buildReport(
       topK: evalSet.topK,
       graphBoost: GRAPH_BOOST,
       expansionDepth: EXPANSION_DEPTH,
+      seedChunkCount: SEED_CHUNK_COUNT,
+      hopDecay: HOP_DECAY,
+      graphSupportWeight: GRAPH_SUPPORT_WEIGHT,
     },
     summary: {
       vectorOnly: summarizeMode(items, (i) => i.vectorOnly),
       graphExpand: summarizeMode(items, (i) => i.graphExpand),
+      graphAugmented: summarizeMode(items, (i) => i.graphAugmented),
     },
-    comparison: compareModes(items, evalSet.topK),
+    comparison: compareModes(items, evalSet.topK, (i) => i.graphExpand),
+    comparisonAugmented: compareModes(items, evalSet.topK, (i) => i.graphAugmented),
     items,
   };
 }
 
 /**
  * Ingest the corpus with the keyless mock provider, then score every question
- * twice on the same retrieved candidates: in vector order, and after the
- * pipeline's graph-expand + rerank step. Uses a throwaway data directory.
+ * in three modes built from one vector ranking: vector-only, the original v1
+ * graph step (reorder the top-k), and the current v2 graph step (expansion
+ * adds candidates, rerank the union, cut to k). Uses a throwaway data directory.
  */
-export async function runRetrievalEval(corpus: Corpus, evalSet: EvalSet): Promise<EvalReport> {
+export async function runRetrievalEval(corpus: Corpus, evalSet: EvalSet): Promise<FullEvalReport> {
   const dataDir = await mkdtemp(join(tmpdir(), 'kg-eval-'));
   try {
     const stores = new AppStores(dataDir, new MockLlmProvider());
     await ingestCorpus(stores, corpus);
     const lookup = buildChunkLookup(stores);
-    const items: ItemReport[] = [];
+    const items: FullItemReport[] = [];
     for (const item of evalSet.items) {
       items.push(await scoreItem(stores, item, evalSet.topK, lookup));
     }

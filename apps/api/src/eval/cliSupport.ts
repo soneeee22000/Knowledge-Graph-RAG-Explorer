@@ -42,13 +42,16 @@ function modeRows(mode: string, summary: ModeSummary): string[] {
   return [row(mode, 'all', summary.all), ...kinds];
 }
 
-/** Markdown table of both modes, overall and per question kind. */
+/** Markdown table of every mode in the report, overall and per question kind. */
 export function formatSummaryTable(report: EvalReport): string {
   return [
     '| Mode | Kind | Items | Hit@1 | Hit@3 | MRR | All evidence in top-k |',
     '| --- | --- | --- | --- | --- | --- | --- |',
     ...modeRows('vector-only', report.summary.vectorOnly),
     ...modeRows('graph-expand', report.summary.graphExpand),
+    ...(report.summary.graphAugmented
+      ? modeRows('graph-augmented', report.summary.graphAugmented)
+      : []),
   ].join('\n');
 }
 

@@ -15,7 +15,10 @@
     "provider": "mock",
     "topK": 6,
     "graphBoost": 0.15,
-    "expansionDepth": 1
+    "expansionDepth": 1,
+    "seedChunkCount": 3,
+    "hopDecay": 0.5,
+    "graphSupportWeight": 1
   },
   "summary": {
     "vectorOnly": {
@@ -79,6 +82,37 @@
           "evidenceTotal": 20
         }
       }
+    },
+    "graphAugmented": {
+      "all": {
+        "items": 20,
+        "hitAt1": 15,
+        "hitAt3": 20,
+        "mrr": 0.875,
+        "allEvidenceRetrieved": 18,
+        "evidenceFound": 28,
+        "evidenceTotal": 30
+      },
+      "byKind": {
+        "single-hop": {
+          "items": 10,
+          "hitAt1": 8,
+          "hitAt3": 10,
+          "mrr": 0.9,
+          "allEvidenceRetrieved": 10,
+          "evidenceFound": 10,
+          "evidenceTotal": 10
+        },
+        "multi-hop": {
+          "items": 10,
+          "hitAt1": 7,
+          "hitAt3": 10,
+          "mrr": 0.85,
+          "allEvidenceRetrieved": 8,
+          "evidenceFound": 18,
+          "evidenceTotal": 20
+        }
+      }
     }
   },
   "comparison": {
@@ -86,6 +120,12 @@
     "worsened": 0,
     "unchanged": 20,
     "orderChanged": 0
+  },
+  "comparisonAugmented": {
+    "improved": 0,
+    "worsened": 1,
+    "unchanged": 19,
+    "orderChanged": 17
   },
   "items": [
     {
@@ -118,6 +158,30 @@
           "The Amber Line#0"
         ],
         "boostedChunks": 6
+      },
+      "graphAugmented": {
+        "rank": 1,
+        "evidenceFound": 1,
+        "evidenceTotal": 1,
+        "retrieved": [
+          "Governance#0",
+          "Valdane Regional Rail#0",
+          "Fares and tickets#0",
+          "The Juniper Line#0",
+          "The Amber Line#0",
+          "Signalling#0"
+        ],
+        "addedChunks": [
+          "Signalling#0",
+          "The Cobalt Line#0",
+          "Incident report: Harbour Point flood#0",
+          "Valdane Regional Rail#1",
+          "Depots and maintenance#0",
+          "Rolling stock#0"
+        ],
+        "promotedChunks": [
+          "Signalling#0"
+        ]
       }
     },
     {
@@ -150,6 +214,28 @@
           "Incident report: Harbour Point flood#0"
         ],
         "boostedChunks": 6
+      },
+      "graphAugmented": {
+        "rank": 1,
+        "evidenceFound": 1,
+        "evidenceTotal": 1,
+        "retrieved": [
+          "The Amber Line#0",
+          "Valdane Regional Rail#0",
+          "The Juniper Line#0",
+          "Signalling#0",
+          "The Cobalt Line#0",
+          "Incident report: Harbour Point flood#0"
+        ],
+        "addedChunks": [
+          "Depots and maintenance#0",
+          "Rolling stock#0",
+          "Fares and tickets#0",
+          "Valdane Regional Rail#1",
+          "Governance#0",
+          "The Amber Line#1"
+        ],
+        "promotedChunks": []
       }
     },
     {
@@ -182,6 +268,28 @@
           "Signalling#0"
         ],
         "boostedChunks": 6
+      },
+      "graphAugmented": {
+        "rank": 1,
+        "evidenceFound": 1,
+        "evidenceTotal": 1,
+        "retrieved": [
+          "Fares and tickets#0",
+          "The Cobalt Line#0",
+          "The Juniper Line#0",
+          "Governance#0",
+          "Valdane Regional Rail#0",
+          "Signalling#0"
+        ],
+        "addedChunks": [
+          "Rolling stock#0",
+          "Incident report: Harbour Point flood#0",
+          "The Amber Line#0",
+          "Valdane Regional Rail#1",
+          "Depots and maintenance#0",
+          "The Amber Line#1"
+        ],
+        "promotedChunks": []
       }
     },
     {
@@ -214,6 +322,28 @@
           "The Cobalt Line#0"
         ],
         "boostedChunks": 6
+      },
+      "graphAugmented": {
+        "rank": 1,
+        "evidenceFound": 1,
+        "evidenceTotal": 1,
+        "retrieved": [
+          "Fares and tickets#0",
+          "Signalling#0",
+          "The Cobalt Line#0",
+          "The Juniper Line#0",
+          "Valdane Regional Rail#0",
+          "Governance#0"
+        ],
+        "addedChunks": [
+          "Valdane Regional Rail#1",
+          "Incident report: Harbour Point flood#0",
+          "The Amber Line#0",
+          "Depots and maintenance#0",
+          "The Amber Line#1",
+          "Rolling stock#0"
+        ],
+        "promotedChunks": []
       }
     },
     {
@@ -246,6 +376,30 @@
           "Valdane Regional Rail#0"
         ],
         "boostedChunks": 6
+      },
+      "graphAugmented": {
+        "rank": 1,
+        "evidenceFound": 1,
+        "evidenceTotal": 1,
+        "retrieved": [
+          "Rolling stock#0",
+          "Depots and maintenance#0",
+          "The Amber Line#0",
+          "The Juniper Line#0",
+          "The Cobalt Line#0",
+          "Incident report: Harbour Point flood#0"
+        ],
+        "addedChunks": [
+          "Incident report: Harbour Point flood#0",
+          "Fares and tickets#0",
+          "Signalling#0",
+          "The Amber Line#1",
+          "Governance#0",
+          "Valdane Regional Rail#1"
+        ],
+        "promotedChunks": [
+          "Incident report: Harbour Point flood#0"
+        ]
       }
     },
     {
@@ -278,6 +432,30 @@
           "The Juniper Line#0"
         ],
         "boostedChunks": 6
+      },
+      "graphAugmented": {
+        "rank": 1,
+        "evidenceFound": 1,
+        "evidenceTotal": 1,
+        "retrieved": [
+          "Valdane Regional Rail#0",
+          "Governance#0",
+          "Fares and tickets#0",
+          "The Amber Line#0",
+          "The Juniper Line#0",
+          "Valdane Regional Rail#1"
+        ],
+        "addedChunks": [
+          "Valdane Regional Rail#1",
+          "Incident report: Harbour Point flood#0",
+          "Signalling#0",
+          "The Cobalt Line#0",
+          "The Amber Line#1",
+          "Rolling stock#0"
+        ],
+        "promotedChunks": [
+          "Valdane Regional Rail#1"
+        ]
       }
     },
     {
@@ -310,6 +488,28 @@
           "The Juniper Line#0"
         ],
         "boostedChunks": 6
+      },
+      "graphAugmented": {
+        "rank": 2,
+        "evidenceFound": 1,
+        "evidenceTotal": 1,
+        "retrieved": [
+          "Fares and tickets#0",
+          "Incident report: Harbour Point flood#0",
+          "The Amber Line#0",
+          "Valdane Regional Rail#0",
+          "Governance#0",
+          "The Juniper Line#0"
+        ],
+        "addedChunks": [
+          "Signalling#0",
+          "The Cobalt Line#0",
+          "Depots and maintenance#0",
+          "Rolling stock#0",
+          "Valdane Regional Rail#1",
+          "The Amber Line#1"
+        ],
+        "promotedChunks": []
       }
     },
     {
@@ -342,6 +542,30 @@
           "Valdane Regional Rail#1"
         ],
         "boostedChunks": 6
+      },
+      "graphAugmented": {
+        "rank": 1,
+        "evidenceFound": 1,
+        "evidenceTotal": 1,
+        "retrieved": [
+          "Signalling#0",
+          "The Amber Line#0",
+          "The Juniper Line#0",
+          "The Cobalt Line#0",
+          "Valdane Regional Rail#0",
+          "Incident report: Harbour Point flood#0"
+        ],
+        "addedChunks": [
+          "Incident report: Harbour Point flood#0",
+          "Fares and tickets#0",
+          "Governance#0",
+          "Rolling stock#0",
+          "Depots and maintenance#0",
+          "The Amber Line#1"
+        ],
+        "promotedChunks": [
+          "Incident report: Harbour Point flood#0"
+        ]
       }
     },
     {
@@ -374,6 +598,30 @@
           "Fares and tickets#0"
         ],
         "boostedChunks": 6
+      },
+      "graphAugmented": {
+        "rank": 2,
+        "evidenceFound": 1,
+        "evidenceTotal": 1,
+        "retrieved": [
+          "Rolling stock#0",
+          "Depots and maintenance#0",
+          "The Amber Line#0",
+          "The Cobalt Line#0",
+          "The Juniper Line#0",
+          "Valdane Regional Rail#0"
+        ],
+        "addedChunks": [
+          "The Amber Line#0",
+          "Incident report: Harbour Point flood#0",
+          "Signalling#0",
+          "Valdane Regional Rail#1",
+          "Governance#0",
+          "The Amber Line#1"
+        ],
+        "promotedChunks": [
+          "The Amber Line#0"
+        ]
       }
     },
     {
@@ -406,6 +654,30 @@
           "The Amber Line#1"
         ],
         "boostedChunks": 6
+      },
+      "graphAugmented": {
+        "rank": 1,
+        "evidenceFound": 1,
+        "evidenceTotal": 1,
+        "retrieved": [
+          "The Cobalt Line#0",
+          "The Juniper Line#0",
+          "Signalling#0",
+          "The Amber Line#0",
+          "Valdane Regional Rail#0",
+          "Depots and maintenance#0"
+        ],
+        "addedChunks": [
+          "Depots and maintenance#0",
+          "Incident report: Harbour Point flood#0",
+          "Governance#0",
+          "Fares and tickets#0",
+          "Valdane Regional Rail#1",
+          "Rolling stock#0"
+        ],
+        "promotedChunks": [
+          "Depots and maintenance#0"
+        ]
       }
     },
     {
@@ -438,6 +710,28 @@
           "Incident report: Harbour Point flood#0"
         ],
         "boostedChunks": 6
+      },
+      "graphAugmented": {
+        "rank": 1,
+        "evidenceFound": 1,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "The Amber Line#0",
+          "The Juniper Line#0",
+          "Valdane Regional Rail#0",
+          "Signalling#0",
+          "The Cobalt Line#0",
+          "Incident report: Harbour Point flood#0"
+        ],
+        "addedChunks": [
+          "Fares and tickets#0",
+          "Rolling stock#0",
+          "Valdane Regional Rail#1",
+          "Governance#0",
+          "Depots and maintenance#0",
+          "The Amber Line#1"
+        ],
+        "promotedChunks": []
       }
     },
     {
@@ -470,6 +764,28 @@
           "Depots and maintenance#0"
         ],
         "boostedChunks": 6
+      },
+      "graphAugmented": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "The Amber Line#0",
+          "Valdane Regional Rail#0",
+          "The Juniper Line#0",
+          "Signalling#0",
+          "The Cobalt Line#0",
+          "Depots and maintenance#0"
+        ],
+        "addedChunks": [
+          "Incident report: Harbour Point flood#0",
+          "Valdane Regional Rail#1",
+          "Fares and tickets#0",
+          "Rolling stock#0",
+          "Governance#0",
+          "The Amber Line#1"
+        ],
+        "promotedChunks": []
       }
     },
     {
@@ -502,6 +818,30 @@
           "Valdane Regional Rail#0"
         ],
         "boostedChunks": 6
+      },
+      "graphAugmented": {
+        "rank": 2,
+        "evidenceFound": 1,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "Fares and tickets#0",
+          "The Juniper Line#0",
+          "The Amber Line#0",
+          "The Cobalt Line#0",
+          "Signalling#0",
+          "Incident report: Harbour Point flood#0"
+        ],
+        "addedChunks": [
+          "Incident report: Harbour Point flood#0",
+          "Valdane Regional Rail#1",
+          "Rolling stock#0",
+          "Depots and maintenance#0",
+          "Governance#0",
+          "The Amber Line#1"
+        ],
+        "promotedChunks": [
+          "Incident report: Harbour Point flood#0"
+        ]
       }
     },
     {
@@ -534,6 +874,28 @@
           "Signalling#0"
         ],
         "boostedChunks": 6
+      },
+      "graphAugmented": {
+        "rank": 2,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "The Juniper Line#0",
+          "The Cobalt Line#0",
+          "The Amber Line#0",
+          "Depots and maintenance#0",
+          "Valdane Regional Rail#0",
+          "Signalling#0"
+        ],
+        "addedChunks": [
+          "Valdane Regional Rail#1",
+          "Fares and tickets#0",
+          "Rolling stock#0",
+          "Governance#0",
+          "Incident report: Harbour Point flood#0",
+          "The Amber Line#1"
+        ],
+        "promotedChunks": []
       }
     },
     {
@@ -566,6 +928,30 @@
           "The Juniper Line#0"
         ],
         "boostedChunks": 6
+      },
+      "graphAugmented": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "Governance#0",
+          "Valdane Regional Rail#0",
+          "Fares and tickets#0",
+          "The Amber Line#0",
+          "The Juniper Line#0",
+          "Signalling#0"
+        ],
+        "addedChunks": [
+          "Signalling#0",
+          "The Cobalt Line#0",
+          "Valdane Regional Rail#1",
+          "Depots and maintenance#0",
+          "The Amber Line#1",
+          "Rolling stock#0"
+        ],
+        "promotedChunks": [
+          "Signalling#0"
+        ]
       }
     },
     {
@@ -598,6 +984,31 @@
           "Valdane Regional Rail#1"
         ],
         "boostedChunks": 6
+      },
+      "graphAugmented": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "Signalling#0",
+          "The Amber Line#0",
+          "Incident report: Harbour Point flood#0",
+          "The Cobalt Line#0",
+          "Governance#0",
+          "Fares and tickets#0"
+        ],
+        "addedChunks": [
+          "Governance#0",
+          "Fares and tickets#0",
+          "The Juniper Line#0",
+          "Depots and maintenance#0",
+          "Rolling stock#0",
+          "The Amber Line#1"
+        ],
+        "promotedChunks": [
+          "Governance#0",
+          "Fares and tickets#0"
+        ]
       }
     },
     {
@@ -630,6 +1041,28 @@
           "Rolling stock#0"
         ],
         "boostedChunks": 6
+      },
+      "graphAugmented": {
+        "rank": 2,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "The Juniper Line#0",
+          "The Amber Line#0",
+          "The Cobalt Line#0",
+          "Signalling#0",
+          "Valdane Regional Rail#0",
+          "Rolling stock#0"
+        ],
+        "addedChunks": [
+          "Incident report: Harbour Point flood#0",
+          "Fares and tickets#0",
+          "Depots and maintenance#0",
+          "Valdane Regional Rail#1",
+          "Governance#0",
+          "The Amber Line#1"
+        ],
+        "promotedChunks": []
       }
     },
     {
@@ -662,6 +1095,30 @@
           "Rolling stock#0"
         ],
         "boostedChunks": 6
+      },
+      "graphAugmented": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "Incident report: Harbour Point flood#0",
+          "The Amber Line#0",
+          "The Amber Line#1",
+          "Governance#0",
+          "Rolling stock#0",
+          "Depots and maintenance#0"
+        ],
+        "addedChunks": [
+          "Depots and maintenance#0",
+          "Valdane Regional Rail#0",
+          "Signalling#0",
+          "The Juniper Line#0",
+          "The Cobalt Line#0",
+          "Valdane Regional Rail#1"
+        ],
+        "promotedChunks": [
+          "Depots and maintenance#0"
+        ]
       }
     },
     {
@@ -694,6 +1151,30 @@
           "The Amber Line#0"
         ],
         "boostedChunks": 6
+      },
+      "graphAugmented": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "Valdane Regional Rail#1",
+          "The Juniper Line#0",
+          "The Cobalt Line#0",
+          "The Amber Line#0",
+          "Valdane Regional Rail#0",
+          "Governance#0"
+        ],
+        "addedChunks": [
+          "Valdane Regional Rail#0",
+          "Incident report: Harbour Point flood#0",
+          "Fares and tickets#0",
+          "Depots and maintenance#0",
+          "Rolling stock#0",
+          "The Amber Line#1"
+        ],
+        "promotedChunks": [
+          "Valdane Regional Rail#0"
+        ]
       }
     },
     {
@@ -726,6 +1207,30 @@
           "Valdane Regional Rail#1"
         ],
         "boostedChunks": 6
+      },
+      "graphAugmented": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "Signalling#0",
+          "The Cobalt Line#0",
+          "The Juniper Line#0",
+          "The Amber Line#0",
+          "Valdane Regional Rail#0",
+          "Incident report: Harbour Point flood#0"
+        ],
+        "addedChunks": [
+          "Incident report: Harbour Point flood#0",
+          "Governance#0",
+          "Fares and tickets#0",
+          "The Amber Line#1",
+          "Rolling stock#0",
+          "Depots and maintenance#0"
+        ],
+        "promotedChunks": [
+          "Incident report: Harbour Point flood#0"
+        ]
       }
     }
   ]

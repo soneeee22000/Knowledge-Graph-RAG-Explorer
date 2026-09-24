@@ -4,7 +4,7 @@ import { loadCorpus, loadEvalSet } from './dataset.js';
 import { runRetrievalEval, type EvalReport } from './retrievalEval.js';
 
 function printReport(report: EvalReport): void {
-  const { corpus, config, comparison } = report;
+  const { corpus, config, comparison, comparisonAugmented } = report;
   console.log(
     `Retrieval eval: ${report.evalSet.items} questions over ${corpus.documents} documents ` +
       `(${corpus.chunks} chunks, ${corpus.entities} entities, ${corpus.relations} relations), ` +
@@ -16,6 +16,14 @@ function printReport(report: EvalReport): void {
       `worsened on ${comparison.worsened}, unchanged on ${comparison.unchanged}; ` +
       `top-k order changed on ${comparison.orderChanged}.`,
   );
+  if (comparisonAugmented) {
+    console.log(
+      `Graph-augmented vs vector order: first-relevant rank improved on ` +
+        `${comparisonAugmented.improved}, worsened on ${comparisonAugmented.worsened}, ` +
+        `unchanged on ${comparisonAugmented.unchanged}; top-k changed on ` +
+        `${comparisonAugmented.orderChanged}.`,
+    );
+  }
 }
 
 async function checkAgainst(path: string, text: string): Promise<boolean> {
