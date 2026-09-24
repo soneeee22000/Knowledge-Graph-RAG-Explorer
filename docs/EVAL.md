@@ -14,7 +14,7 @@ This is a small, authored check, not a benchmark. It has been run twice: once on
 |                                   | graph-augmented (v2) | 6/8   | 8/8   | 0.875 | 6/8                   |
 
 - **v1 was a no-op.** It changed the top-6 order on 0 of 20 questions.
-- **v2 changes retrieval, but it does not improve it on this data.** It changed the top-6 on 17 of 20 original questions and 5 of 8 post-fix questions. It brought no missing evidence chunk into the top 6 on either set. On the original set it cost one Hit@1 (`m03`: the first relevant chunk moved from rank 1 to rank 2), so MRR dropped from 0.900 to 0.875.
+- **v2 changes retrieval, but it does not improve it on this data.** It reordered the top 6 on 17 of 20 original questions and 5 of 8 post-fix questions, and changed which chunks were in it on 12 and 2 of those (`membershipChanged` in the results files). It brought no missing evidence chunk into the top 6 on either set. On the original set it cost one Hit@1 (`m03`: the first relevant chunk moved from rank 1 to rank 2), so MRR dropped from 0.900 to 0.875.
 - **Neither set shows a gain, and the likely cause is the mock graph, not the questions.** The mock extractor's graph is so densely connected that v2's graph support comes out almost the same for every chunk (explained below).
 
 ## What is compared
@@ -71,7 +71,7 @@ Original 20 questions:
 
 Compared with vector-only, v2's first-relevant rank improved on 0 questions, worsened on 1 (`m03`) and was unchanged on 19. On every question, v2 added all 6 chunks outside the vector top 6 to the candidate list. On 12 questions, 13 of those added chunks made the final top 6. None of them was a missing evidence chunk. The two multi-hop misses, `m01` and `m03`, are the same under all three modes.
 
-Post-fix 8 questions: all three modes score the same on every metric. v2 changed the top 6 on 5 of 8 questions and promoted 3 added chunks, on 2 questions. The two misses, `p03` and `p04`, are the same under all three modes.
+Post-fix 8 questions: all three modes score the same on every metric. v2 reordered the top 6 on 5 of 8 questions and promoted 3 added chunks into it, on 2 questions. The two misses, `p03` and `p04`, are the same under all three modes.
 
 ## Why v1 changed nothing
 

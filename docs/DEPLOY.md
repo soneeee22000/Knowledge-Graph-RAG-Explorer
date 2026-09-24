@@ -8,26 +8,26 @@ The recommended layout is **one Vercel project** that serves the web app and run
 
 A public instance must run with `DEMO_READONLY=1`. The mode is covered by `apps/api/src/server.readonly.test.ts` and `apps/api/src/demo/rateLimit.test.ts`.
 
-| Behaviour           | Detail                                                                                                                                                                                                                                                                                           |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Seeded on boot      | The stores are cleared and the committed sample (`apps/api/eval/corpus.json`: 10 fictional rail documents, 12 chunks, 51 entities) is ingested. It is bundled into the build, so every instance serves the same corpus after every cold start.                                                   |
-| Writes refused      | `POST /api/ingest` and `DELETE /api/corpus` return `403` with `{"error":{"code":"read_only_demo","message":"This is a read-only public demo: ..."}}`.                                                                                                                                            |
-| Rate limit          | Per client IP, fixed one-minute window. The default is 60 requests per minute in read-only mode; `RATE_LIMIT_PER_MINUTE` overrides it. Over the limit returns `429` with `Retry-After` and code `rate_limited`. `/api/health` is exempt.                                                         |
-| Client IP           | The socket address, unless `TRUST_PROXY=1`, in which case Fastify reads `X-Forwarded-For`. Set it only behind a proxy that overwrites that header (Vercel and Render do). Without it, every request looks like it comes from the proxy.                                                          |
-| Web app             | `/api/health` reports `readOnly: true`. The web app then hides the ingest form and the reset button, shows a read-only notice, and suggests questions about the rail corpus.                                                                                                                     |
-| Limits of the limit | The counts live in memory, per instance. If the platform runs several instances, each one counts separately, so the effective limit is higher. It is a courtesy limit against casual abuse, not protection against a determined client. For that, use the platform's firewall or WAF rate rules. |
+| Behaviour           | Detail                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Seeded on boot      | The stores are cleared and the committed sample (`apps/api/eval/corpus.json`: 10 fictional rail documents, 12 chunks, 51 entities) is ingested. It is bundled into the build, so every instance serves the same corpus after every cold start.                                                                                                                                                                                                                                                      |
+| Writes refused      | `POST /api/ingest` and `DELETE /api/corpus` return `403` with `{"error":{"code":"read_only_demo","message":"This is a read-only public demo: ..."}}`.                                                                                                                                                                                                                                                                                                                                               |
+| Rate limit          | Per client IP, fixed one-minute window. The default is 60 requests per minute in read-only mode; `RATE_LIMIT_PER_MINUTE` overrides it. Over the limit returns `429` with `Retry-After` and code `rate_limited`. `/api/health` is exempt.                                                                                                                                                                                                                                                            |
+| Client IP           | The socket address, unless `TRUST_PROXY=1`. Then Fastify trusts exactly one proxy hop and takes the last `X-Forwarded-For` entry, the one the platform's proxy wrote; entries a client sends ahead of it are ignored (tested in `server.readonly.test.ts`). Set it only when the API sits behind exactly one proxy. Behind two or more, every client would share the inner proxy's address; that was not checked on Render or Vercel. Without it, every request looks like it comes from the proxy. |
+| Web app             | `/api/health` reports `readOnly: true`. The web app then hides the ingest form and the reset button, shows a read-only notice, and suggests questions about the rail corpus.                                                                                                                                                                                                                                                                                                                        |
+| Limits of the limit | The counts live in memory, per instance. If the platform runs several instances, each one counts separately, so the effective limit is higher. At most 10,000 client IPs are tracked per window; while that table is full, new clients get 429. It is a courtesy limit against casual abuse, not protection against a determined client. For that, use the platform's firewall or WAF rate rules.                                                                                                   |
 
 ## Environment variables
 
-| Variable                | Where                      | Value for the public demo                                        |
-| ----------------------- | -------------------------- | ---------------------------------------------------------------- |
-| `DEMO_READONLY`         | API on Render or Cloud Run | `1` (the Vercel Function forces it on)                           |
-| `TRUST_PROXY`           | API                        | `1` (behind Vercel or Render only)                               |
-| `DATA_DIR`              | API on Vercel              | `/tmp/kg-data` (the only writable path in a Vercel Function)     |
-| `RATE_LIMIT_PER_MINUTE` | API, optional              | unset (60) or a number                                           |
-| `LLM_PROVIDER`          | API                        | unset or `mock`. Never `baml` on a public instance               |
-| `CORS_ORIGIN`           | API on Render only         | the web app's exact origin                                       |
-| `VITE_API_URL`          | web, at build time         | `/` when the API is on the same origin; the Render URL otherwise |
+| Variable                | Where                      | Value for the public demo                                                        |
+| ----------------------- | -------------------------- | -------------------------------------------------------------------------------- |
+| `DEMO_READONLY`         | API on Render or Cloud Run | `1` (the Vercel Function forces it on)                                           |
+| `TRUST_PROXY`           | API                        | `1` (behind Vercel or Render only)                                               |
+| `DATA_DIR`              | API on Vercel, optional    | unset: the function defaults to `<os temp dir>/kg-data`, the only writable place |
+| `RATE_LIMIT_PER_MINUTE` | API, optional              | unset (60) or a number                                                           |
+| `LLM_PROVIDER`          | API                        | unset or `mock`. Never `baml` on a public instance                               |
+| `CORS_ORIGIN`           | API on Render only         | the web app's exact origin                                                       |
+| `VITE_API_URL`          | web, at build time         | `/` when the API is on the same origin; the Render URL otherwise                 |
 
 No API key is needed anywhere. Do not add `ANTHROPIC_API_KEY` to a public project.
 
@@ -83,7 +83,6 @@ vercel login
 vercel link --yes --project knowledge-graph-rag-explorer
 
 printf '1' | vercel env add TRUST_PROXY production
-printf '/tmp/kg-data' | vercel env add DATA_DIR production
 printf '/' | vercel env add VITE_API_URL production
 # Optional: printf '0' | vercel env add NODEJS_HELPERS production
 #   turns off Vercel's request helpers so Fastify reads the raw body itself.

@@ -19,10 +19,17 @@ All notable changes to this project. Format follows [Keep a Changelog](https://k
 - Graph expansion and the graph rerank moved into `apps/api/src/agents/graphRetrieval.ts`, so the app and the evaluation run the same code.
 - README rewritten: results, limitations and roadmap added, and the Mastra and rerank claims corrected to match the code.
 
+### Fixed
+
+- Behind a proxy (`TRUST_PROXY=1`), the rate limiter took the client IP from the leftmost `X-Forwarded-For` entry, which a client can set, so a varying fake entry bypassed the limit. It now trusts one proxy hop and uses the entry the proxy wrote.
+- The rate limiter tracks at most 10,000 client keys per window; new clients are refused while the table is full, so a flood of distinct keys cannot grow memory without bound.
+- The Vercel handler defaults `DATA_DIR` to the OS temp directory, so the function no longer depends on that variable being set.
+- The eval reports `membershipChanged` next to `orderChanged`, and the docs no longer present order-only changes as changes to the top-6 set.
+
 ### Documented
 
 - The graph rerank never changes the top-k order on the evaluation set: every retrieved chunk receives the same boost.
-- The rebuilt graph step changes the top-6 on 17 of 20 questions, but on the authored sets it recovers no missing evidence and lowers Hit@1 from 16/20 to 15/20 (MRR 0.900 to 0.875). The diagnosis is in `docs/EVAL.md`.
+- The rebuilt graph step reorders the top-6 on 17 of 20 questions and changes its membership on 12, but on the authored sets it recovers no missing evidence and lowers Hit@1 from 16/20 to 15/20 (MRR 0.900 to 0.875). The diagnosis is in `docs/EVAL.md`.
 
 ## [0.1.0] - 2026-06-29
 
