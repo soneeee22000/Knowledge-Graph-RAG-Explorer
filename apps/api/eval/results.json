@@ -1,0 +1,732 @@
+{
+  "evalSet": {
+    "name": "valdane-rail-retrieval-v1",
+    "author": "Pyae Sone (Seon), repo author",
+    "items": 20
+  },
+  "corpus": {
+    "name": "valdane-rail",
+    "documents": 10,
+    "chunks": 12,
+    "entities": 51,
+    "relations": 68
+  },
+  "config": {
+    "provider": "mock",
+    "topK": 6,
+    "graphBoost": 0.15,
+    "expansionDepth": 1
+  },
+  "summary": {
+    "vectorOnly": {
+      "all": {
+        "items": 20,
+        "hitAt1": 16,
+        "hitAt3": 20,
+        "mrr": 0.9,
+        "allEvidenceRetrieved": 18,
+        "evidenceFound": 28,
+        "evidenceTotal": 30
+      },
+      "byKind": {
+        "single-hop": {
+          "items": 10,
+          "hitAt1": 8,
+          "hitAt3": 10,
+          "mrr": 0.9,
+          "allEvidenceRetrieved": 10,
+          "evidenceFound": 10,
+          "evidenceTotal": 10
+        },
+        "multi-hop": {
+          "items": 10,
+          "hitAt1": 8,
+          "hitAt3": 10,
+          "mrr": 0.9,
+          "allEvidenceRetrieved": 8,
+          "evidenceFound": 18,
+          "evidenceTotal": 20
+        }
+      }
+    },
+    "graphExpand": {
+      "all": {
+        "items": 20,
+        "hitAt1": 16,
+        "hitAt3": 20,
+        "mrr": 0.9,
+        "allEvidenceRetrieved": 18,
+        "evidenceFound": 28,
+        "evidenceTotal": 30
+      },
+      "byKind": {
+        "single-hop": {
+          "items": 10,
+          "hitAt1": 8,
+          "hitAt3": 10,
+          "mrr": 0.9,
+          "allEvidenceRetrieved": 10,
+          "evidenceFound": 10,
+          "evidenceTotal": 10
+        },
+        "multi-hop": {
+          "items": 10,
+          "hitAt1": 8,
+          "hitAt3": 10,
+          "mrr": 0.9,
+          "allEvidenceRetrieved": 8,
+          "evidenceFound": 18,
+          "evidenceTotal": 20
+        }
+      }
+    }
+  },
+  "comparison": {
+    "improved": 0,
+    "worsened": 0,
+    "unchanged": 20,
+    "orderChanged": 0
+  },
+  "items": [
+    {
+      "id": "s01",
+      "kind": "single-hop",
+      "question": "Who chairs the board of the Valdane Transport Authority?",
+      "vectorOnly": {
+        "rank": 1,
+        "evidenceFound": 1,
+        "evidenceTotal": 1,
+        "retrieved": [
+          "Governance#0",
+          "Valdane Regional Rail#0",
+          "Fares and tickets#0",
+          "The Amber Line#1",
+          "The Juniper Line#0",
+          "The Amber Line#0"
+        ]
+      },
+      "graphExpand": {
+        "rank": 1,
+        "evidenceFound": 1,
+        "evidenceTotal": 1,
+        "retrieved": [
+          "Governance#0",
+          "Valdane Regional Rail#0",
+          "Fares and tickets#0",
+          "The Amber Line#1",
+          "The Juniper Line#0",
+          "The Amber Line#0"
+        ],
+        "boostedChunks": 6
+      }
+    },
+    {
+      "id": "s02",
+      "kind": "single-hop",
+      "question": "When did the Amber Line open in its current form?",
+      "vectorOnly": {
+        "rank": 1,
+        "evidenceFound": 1,
+        "evidenceTotal": 1,
+        "retrieved": [
+          "The Amber Line#0",
+          "Valdane Regional Rail#0",
+          "The Juniper Line#0",
+          "Signalling#0",
+          "The Cobalt Line#0",
+          "Incident report: Harbour Point flood#0"
+        ]
+      },
+      "graphExpand": {
+        "rank": 1,
+        "evidenceFound": 1,
+        "evidenceTotal": 1,
+        "retrieved": [
+          "The Amber Line#0",
+          "Valdane Regional Rail#0",
+          "The Juniper Line#0",
+          "Signalling#0",
+          "The Cobalt Line#0",
+          "Incident report: Harbour Point flood#0"
+        ],
+        "boostedChunks": 6
+      }
+    },
+    {
+      "id": "s03",
+      "kind": "single-hop",
+      "question": "What smart card do passengers use to pay fares?",
+      "vectorOnly": {
+        "rank": 1,
+        "evidenceFound": 1,
+        "evidenceTotal": 1,
+        "retrieved": [
+          "Fares and tickets#0",
+          "The Juniper Line#0",
+          "Governance#0",
+          "Valdane Regional Rail#0",
+          "The Cobalt Line#0",
+          "Signalling#0"
+        ]
+      },
+      "graphExpand": {
+        "rank": 1,
+        "evidenceFound": 1,
+        "evidenceTotal": 1,
+        "retrieved": [
+          "Fares and tickets#0",
+          "The Juniper Line#0",
+          "Governance#0",
+          "Valdane Regional Rail#0",
+          "The Cobalt Line#0",
+          "Signalling#0"
+        ],
+        "boostedChunks": 6
+      }
+    },
+    {
+      "id": "s04",
+      "kind": "single-hop",
+      "question": "Which company manages Tallypass?",
+      "vectorOnly": {
+        "rank": 1,
+        "evidenceFound": 1,
+        "evidenceTotal": 1,
+        "retrieved": [
+          "Fares and tickets#0",
+          "Signalling#0",
+          "Valdane Regional Rail#0",
+          "The Juniper Line#0",
+          "Governance#0",
+          "The Cobalt Line#0"
+        ]
+      },
+      "graphExpand": {
+        "rank": 1,
+        "evidenceFound": 1,
+        "evidenceTotal": 1,
+        "retrieved": [
+          "Fares and tickets#0",
+          "Signalling#0",
+          "Valdane Regional Rail#0",
+          "The Juniper Line#0",
+          "Governance#0",
+          "The Cobalt Line#0"
+        ],
+        "boostedChunks": 6
+      }
+    },
+    {
+      "id": "s05",
+      "kind": "single-hop",
+      "question": "How many passengers does a Series 22 unit seat?",
+      "vectorOnly": {
+        "rank": 1,
+        "evidenceFound": 1,
+        "evidenceTotal": 1,
+        "retrieved": [
+          "Rolling stock#0",
+          "The Cobalt Line#0",
+          "Depots and maintenance#0",
+          "The Juniper Line#0",
+          "The Amber Line#0",
+          "Valdane Regional Rail#0"
+        ]
+      },
+      "graphExpand": {
+        "rank": 1,
+        "evidenceFound": 1,
+        "evidenceTotal": 1,
+        "retrieved": [
+          "Rolling stock#0",
+          "The Cobalt Line#0",
+          "Depots and maintenance#0",
+          "The Juniper Line#0",
+          "The Amber Line#0",
+          "Valdane Regional Rail#0"
+        ],
+        "boostedChunks": 6
+      }
+    },
+    {
+      "id": "s06",
+      "kind": "single-hop",
+      "question": "Where is the head office of Valdane Regional Rail?",
+      "vectorOnly": {
+        "rank": 1,
+        "evidenceFound": 1,
+        "evidenceTotal": 1,
+        "retrieved": [
+          "Valdane Regional Rail#0",
+          "Governance#0",
+          "Fares and tickets#0",
+          "The Amber Line#0",
+          "Depots and maintenance#0",
+          "The Juniper Line#0"
+        ]
+      },
+      "graphExpand": {
+        "rank": 1,
+        "evidenceFound": 1,
+        "evidenceTotal": 1,
+        "retrieved": [
+          "Valdane Regional Rail#0",
+          "Governance#0",
+          "Fares and tickets#0",
+          "The Amber Line#0",
+          "Depots and maintenance#0",
+          "The Juniper Line#0"
+        ],
+        "boostedChunks": 6
+      }
+    },
+    {
+      "id": "s07",
+      "kind": "single-hop",
+      "question": "What flooded at Harbour Point station in October 2024?",
+      "vectorOnly": {
+        "rank": 2,
+        "evidenceFound": 1,
+        "evidenceTotal": 1,
+        "retrieved": [
+          "Fares and tickets#0",
+          "Incident report: Harbour Point flood#0",
+          "Governance#0",
+          "The Amber Line#0",
+          "Valdane Regional Rail#0",
+          "The Juniper Line#0"
+        ]
+      },
+      "graphExpand": {
+        "rank": 2,
+        "evidenceFound": 1,
+        "evidenceTotal": 1,
+        "retrieved": [
+          "Fares and tickets#0",
+          "Incident report: Harbour Point flood#0",
+          "Governance#0",
+          "The Amber Line#0",
+          "Valdane Regional Rail#0",
+          "The Juniper Line#0"
+        ],
+        "boostedChunks": 6
+      }
+    },
+    {
+      "id": "s08",
+      "kind": "single-hop",
+      "question": "Which company replaced the signalling on the Amber Line?",
+      "vectorOnly": {
+        "rank": 1,
+        "evidenceFound": 1,
+        "evidenceTotal": 1,
+        "retrieved": [
+          "Signalling#0",
+          "Valdane Regional Rail#0",
+          "The Amber Line#0",
+          "The Juniper Line#0",
+          "The Cobalt Line#0",
+          "Valdane Regional Rail#1"
+        ]
+      },
+      "graphExpand": {
+        "rank": 1,
+        "evidenceFound": 1,
+        "evidenceTotal": 1,
+        "retrieved": [
+          "Signalling#0",
+          "Valdane Regional Rail#0",
+          "The Amber Line#0",
+          "The Juniper Line#0",
+          "The Cobalt Line#0",
+          "Valdane Regional Rail#1"
+        ],
+        "boostedChunks": 6
+      }
+    },
+    {
+      "id": "s09",
+      "kind": "single-hop",
+      "question": "Which contractor re-profiles the wheels of Series 22 trains?",
+      "vectorOnly": {
+        "rank": 2,
+        "evidenceFound": 1,
+        "evidenceTotal": 1,
+        "retrieved": [
+          "Rolling stock#0",
+          "Depots and maintenance#0",
+          "Valdane Regional Rail#0",
+          "The Cobalt Line#0",
+          "The Juniper Line#0",
+          "Fares and tickets#0"
+        ]
+      },
+      "graphExpand": {
+        "rank": 2,
+        "evidenceFound": 1,
+        "evidenceTotal": 1,
+        "retrieved": [
+          "Rolling stock#0",
+          "Depots and maintenance#0",
+          "Valdane Regional Rail#0",
+          "The Cobalt Line#0",
+          "The Juniper Line#0",
+          "Fares and tickets#0"
+        ],
+        "boostedChunks": 6
+      }
+    },
+    {
+      "id": "s10",
+      "kind": "single-hop",
+      "question": "What is the journey time on the Cobalt Line?",
+      "vectorOnly": {
+        "rank": 1,
+        "evidenceFound": 1,
+        "evidenceTotal": 1,
+        "retrieved": [
+          "The Cobalt Line#0",
+          "The Juniper Line#0",
+          "Signalling#0",
+          "The Amber Line#0",
+          "Valdane Regional Rail#0",
+          "The Amber Line#1"
+        ]
+      },
+      "graphExpand": {
+        "rank": 1,
+        "evidenceFound": 1,
+        "evidenceTotal": 1,
+        "retrieved": [
+          "The Cobalt Line#0",
+          "The Juniper Line#0",
+          "Signalling#0",
+          "The Amber Line#0",
+          "Valdane Regional Rail#0",
+          "The Amber Line#1"
+        ],
+        "boostedChunks": 6
+      }
+    },
+    {
+      "id": "m01",
+      "kind": "multi-hop",
+      "question": "Which company builds the trains that run on the Amber Line?",
+      "vectorOnly": {
+        "rank": 1,
+        "evidenceFound": 1,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "The Amber Line#0",
+          "The Juniper Line#0",
+          "Valdane Regional Rail#0",
+          "Signalling#0",
+          "The Cobalt Line#0",
+          "Incident report: Harbour Point flood#0"
+        ]
+      },
+      "graphExpand": {
+        "rank": 1,
+        "evidenceFound": 1,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "The Amber Line#0",
+          "The Juniper Line#0",
+          "Valdane Regional Rail#0",
+          "Signalling#0",
+          "The Cobalt Line#0",
+          "Incident report: Harbour Point flood#0"
+        ],
+        "boostedChunks": 6
+      }
+    },
+    {
+      "id": "m02",
+      "kind": "multi-hop",
+      "question": "At which depot are the Amber Line trains overhauled?",
+      "vectorOnly": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "The Amber Line#0",
+          "The Juniper Line#0",
+          "Valdane Regional Rail#0",
+          "Signalling#0",
+          "The Cobalt Line#0",
+          "Depots and maintenance#0"
+        ]
+      },
+      "graphExpand": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "The Amber Line#0",
+          "The Juniper Line#0",
+          "Valdane Regional Rail#0",
+          "Signalling#0",
+          "The Cobalt Line#0",
+          "Depots and maintenance#0"
+        ],
+        "boostedChunks": 6
+      }
+    },
+    {
+      "id": "m03",
+      "kind": "multi-hop",
+      "question": "Who manufactured the trains used on the Juniper Line?",
+      "vectorOnly": {
+        "rank": 1,
+        "evidenceFound": 1,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "The Juniper Line#0",
+          "Fares and tickets#0",
+          "The Amber Line#0",
+          "Signalling#0",
+          "The Cobalt Line#0",
+          "Valdane Regional Rail#0"
+        ]
+      },
+      "graphExpand": {
+        "rank": 1,
+        "evidenceFound": 1,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "The Juniper Line#0",
+          "Fares and tickets#0",
+          "The Amber Line#0",
+          "Signalling#0",
+          "The Cobalt Line#0",
+          "Valdane Regional Rail#0"
+        ],
+        "boostedChunks": 6
+      }
+    },
+    {
+      "id": "m04",
+      "kind": "multi-hop",
+      "question": "Which depot services the trains of the Cobalt Line?",
+      "vectorOnly": {
+        "rank": 2,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "The Juniper Line#0",
+          "The Cobalt Line#0",
+          "The Amber Line#0",
+          "Valdane Regional Rail#0",
+          "Depots and maintenance#0",
+          "Signalling#0"
+        ]
+      },
+      "graphExpand": {
+        "rank": 2,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "The Juniper Line#0",
+          "The Cobalt Line#0",
+          "The Amber Line#0",
+          "Valdane Regional Rail#0",
+          "Depots and maintenance#0",
+          "Signalling#0"
+        ],
+        "boostedChunks": 6
+      }
+    },
+    {
+      "id": "m05",
+      "kind": "multi-hop",
+      "question": "Who chairs the body that owns Valdane Regional Rail?",
+      "vectorOnly": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "Governance#0",
+          "Valdane Regional Rail#0",
+          "Fares and tickets#0",
+          "The Amber Line#0",
+          "Incident report: Harbour Point flood#0",
+          "The Juniper Line#0"
+        ]
+      },
+      "graphExpand": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "Governance#0",
+          "Valdane Regional Rail#0",
+          "Fares and tickets#0",
+          "The Amber Line#0",
+          "Incident report: Harbour Point flood#0",
+          "The Juniper Line#0"
+        ],
+        "boostedChunks": 6
+      }
+    },
+    {
+      "id": "m06",
+      "kind": "multi-hop",
+      "question": "How fast must a technician reach a signalling fault at Harbour Point?",
+      "vectorOnly": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "Signalling#0",
+          "The Amber Line#0",
+          "Incident report: Harbour Point flood#0",
+          "Valdane Regional Rail#0",
+          "The Cobalt Line#0",
+          "Valdane Regional Rail#1"
+        ]
+      },
+      "graphExpand": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "Signalling#0",
+          "The Amber Line#0",
+          "Incident report: Harbour Point flood#0",
+          "Valdane Regional Rail#0",
+          "The Cobalt Line#0",
+          "Valdane Regional Rail#1"
+        ],
+        "boostedChunks": 6
+      }
+    },
+    {
+      "id": "m07",
+      "kind": "multi-hop",
+      "question": "How many passengers can each Amber Line train seat?",
+      "vectorOnly": {
+        "rank": 2,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "The Juniper Line#0",
+          "The Amber Line#0",
+          "The Cobalt Line#0",
+          "Signalling#0",
+          "Valdane Regional Rail#0",
+          "Rolling stock#0"
+        ]
+      },
+      "graphExpand": {
+        "rank": 2,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "The Juniper Line#0",
+          "The Amber Line#0",
+          "The Cobalt Line#0",
+          "Signalling#0",
+          "Valdane Regional Rail#0",
+          "Rolling stock#0"
+        ],
+        "boostedChunks": 6
+      }
+    },
+    {
+      "id": "m08",
+      "kind": "multi-hop",
+      "question": "Who built the trains that were held at Kestrel Hill during the Harbour Point flood?",
+      "vectorOnly": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "Incident report: Harbour Point flood#0",
+          "The Amber Line#1",
+          "The Amber Line#0",
+          "Governance#0",
+          "Fares and tickets#0",
+          "Rolling stock#0"
+        ]
+      },
+      "graphExpand": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "Incident report: Harbour Point flood#0",
+          "The Amber Line#1",
+          "The Amber Line#0",
+          "Governance#0",
+          "Fares and tickets#0",
+          "Rolling stock#0"
+        ],
+        "boostedChunks": 6
+      }
+    },
+    {
+      "id": "m09",
+      "kind": "multi-hop",
+      "question": "Who approved the track doubling on the line with the worst punctuality?",
+      "vectorOnly": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "Valdane Regional Rail#1",
+          "The Juniper Line#0",
+          "Signalling#0",
+          "The Cobalt Line#0",
+          "Governance#0",
+          "The Amber Line#0"
+        ]
+      },
+      "graphExpand": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "Valdane Regional Rail#1",
+          "The Juniper Line#0",
+          "Signalling#0",
+          "The Cobalt Line#0",
+          "Governance#0",
+          "The Amber Line#0"
+        ],
+        "boostedChunks": 6
+      }
+    },
+    {
+      "id": "m10",
+      "kind": "multi-hop",
+      "question": "What kind of signalling does the line to the airport use?",
+      "vectorOnly": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "Signalling#0",
+          "The Cobalt Line#0",
+          "The Juniper Line#0",
+          "The Amber Line#0",
+          "Valdane Regional Rail#0",
+          "Valdane Regional Rail#1"
+        ]
+      },
+      "graphExpand": {
+        "rank": 1,
+        "evidenceFound": 2,
+        "evidenceTotal": 2,
+        "retrieved": [
+          "Signalling#0",
+          "The Cobalt Line#0",
+          "The Juniper Line#0",
+          "The Amber Line#0",
+          "Valdane Regional Rail#0",
+          "Valdane Regional Rail#1"
+        ],
+        "boostedChunks": 6
+      }
+    }
+  ]
+}

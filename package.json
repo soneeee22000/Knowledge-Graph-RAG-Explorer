@@ -22,6 +22,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "npm run test --workspaces --if-present",
+    "eval": "npm run eval --workspace @kg/api",
+    "eval:check": "npm run eval:check --workspace @kg/api",
     "baml:generate": "baml-cli generate --from packages/baml/baml_src"
   },
   "devDependencies": {
