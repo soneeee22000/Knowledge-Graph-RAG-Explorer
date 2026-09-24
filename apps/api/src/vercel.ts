@@ -8,13 +8,14 @@ export type NodeHandler = (req: IncomingMessage, res: ServerResponse) => Promise
 
 /**
  * Wrap the Fastify app as a Node handler for a serverless function. The app
- * (and, in read-only mode, the seeded corpus) is built once per instance on
- * the first request and reused while the instance stays warm.
+ * and its seeded corpus are built once per instance on the first request and
+ * reused while the instance stays warm. Read-only mode is forced: separate
+ * serverless instances cannot share a writable in-memory corpus.
  */
 export function createVercelHandler(env: NodeJS.ProcessEnv = process.env): NodeHandler {
   let appPromise: Promise<FastifyInstance> | undefined;
   const app = (): Promise<FastifyInstance> => {
-    appPromise ??= buildServer({ config: loadConfig(env) })
+    appPromise ??= buildServer({ config: loadConfig({ ...env, DEMO_READONLY: '1' }) })
       .then(async (built) => {
         await built.ready();
         return built;

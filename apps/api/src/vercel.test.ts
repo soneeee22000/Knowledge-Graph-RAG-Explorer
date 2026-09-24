@@ -70,3 +70,20 @@ describe('createVercelHandler', () => {
     expect(res.status).toBe(403);
   });
 });
+
+describe('createVercelHandler without DEMO_READONLY', () => {
+  it('still runs read-only, because a writable corpus cannot survive serverless instances', async () => {
+    const handler = createVercelHandler({ DATA_DIR: join(tmpdir(), 'kg-vercel-forced') });
+    const plain = createServer((req, res) => void handler(req, res));
+    await new Promise<void>((resolve) => plain.listen(0, '127.0.0.1', resolve));
+    const url = `http://127.0.0.1:${(plain.address() as AddressInfo).port}`;
+    try {
+      const health = await getJson<Health>(`${url}/api/health`);
+      expect(health.readOnly).toBe(true);
+      const res = await fetch(`${url}/api/corpus`, { method: 'DELETE' });
+      expect(res.status).toBe(403);
+    } finally {
+      await new Promise<void>((resolve) => plain.close(() => resolve()));
+    }
+  });
+});
