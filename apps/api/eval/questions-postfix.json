@@ -1,0 +1,86 @@
+{
+  "name": "valdane-rail-retrieval-postfix-v1",
+  "author": "repo author (post-fix stratum)",
+  "note": "Eight multi-hop questions written on 2026-09-24, AFTER the graph-augmented step was implemented and after its results on the original 20 questions were known. They are reported as a separate stratum and never merged with questions.json. Each answer needs a second chunk reached through a bridging entity (a train series, a card, an authority) that the question does not name. Same corpus and topK as the original set. Committed before any result on this set was generated.",
+  "topK": 6,
+  "items": [
+    {
+      "id": "p01",
+      "kind": "multi-hop",
+      "question": "Which company holds the maintenance contract for the trains that serve Harbour Point?",
+      "evidence": [
+        { "document": "The Amber Line", "contains": "operated with Series 40 trains" },
+        { "document": "Rolling stock", "contains": "maintenance contract for the Series 40 fleet" }
+      ]
+    },
+    {
+      "id": "p02",
+      "kind": "multi-hop",
+      "question": "How many carriages do the trains to the airport have?",
+      "evidence": [
+        { "document": "The Cobalt Line", "contains": "uses Series 22 trains" },
+        { "document": "Rolling stock", "contains": "Series 22 units have four carriages" }
+      ]
+    },
+    {
+      "id": "p03",
+      "kind": "multi-hop",
+      "question": "In which town is the manufacturer of the Amber Line trains based?",
+      "evidence": [
+        { "document": "The Amber Line", "contains": "operated with Series 40 trains" },
+        { "document": "Rolling stock", "contains": "based in the town of Brennock" }
+      ]
+    },
+    {
+      "id": "p04",
+      "kind": "multi-hop",
+      "question": "Which company re-profiles the wheels of the trains used on the Juniper Line?",
+      "evidence": [
+        { "document": "The Juniper Line", "contains": "uses Series 22 trains" },
+        { "document": "Depots and maintenance", "contains": "Fairlie Engineering" }
+      ]
+    },
+    {
+      "id": "p05",
+      "kind": "multi-hop",
+      "question": "Which company manages the card whose zone does not include the airport?",
+      "evidence": [
+        { "document": "The Cobalt Line", "contains": "outside the Tallypass zone" },
+        {
+          "document": "Fares and tickets",
+          "contains": "managed by a company called Meridia Payments"
+        }
+      ]
+    },
+    {
+      "id": "p06",
+      "kind": "multi-hop",
+      "question": "In which year was the signalling renewed on the line that calls at Mirel Bridge?",
+      "evidence": [
+        { "document": "The Amber Line", "contains": "calling at Harbour Point, Mirel Bridge" },
+        { "document": "Signalling", "contains": "replaced in 2016 by Northgate Systems" }
+      ]
+    },
+    {
+      "id": "p07",
+      "kind": "multi-hop",
+      "question": "Who chairs the body that approved the Juniper Line track doubling?",
+      "evidence": [
+        {
+          "document": "The Juniper Line",
+          "contains": "approved by the Valdane Transport Authority in 2023"
+        },
+        { "document": "Governance", "contains": "chaired by Ilse Moravec" }
+      ]
+    },
+    {
+      "id": "p08",
+      "kind": "multi-hop",
+      "question": "From which year are the trains on the airport line due to be replaced?",
+      "evidence": [
+        { "document": "The Cobalt Line", "contains": "uses Series 22 trains" },
+        { "document": "Rolling stock", "contains": "due to be replaced from 2027" }
+      ]
+    }
+  ]
+}

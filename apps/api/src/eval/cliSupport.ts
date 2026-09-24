@@ -1,3 +1,10 @@
+import { basename } from 'node:path';
+import {
+  POSTFIX_QUESTIONS_FILE,
+  POSTFIX_RESULTS_FILE,
+  QUESTIONS_FILE,
+  RESULTS_FILE,
+} from './dataset.js';
 import type { Summary } from './metrics.js';
 import type { EvalReport, ModeSummary } from './retrievalEval.js';
 
@@ -9,6 +16,18 @@ export interface CliArgs {
   json: string | undefined;
   /** Compare a fresh report with this committed file and fail on any difference. */
   check: string | undefined;
+}
+
+const QUESTIONS_BY_RESULTS: Readonly<Record<string, string>> = {
+  [RESULTS_FILE]: QUESTIONS_FILE,
+  [POSTFIX_RESULTS_FILE]: POSTFIX_QUESTIONS_FILE,
+};
+
+/** The question set a committed results file is generated from, by file name. */
+export function questionsFileFor(resultsPath: string): string {
+  const questions = QUESTIONS_BY_RESULTS[basename(resultsPath)];
+  if (!questions) throw new Error(`No question set is mapped to ${resultsPath}`);
+  return questions;
 }
 
 /** Parse `--json <path>` and `--check <path>`; throws on anything else. */

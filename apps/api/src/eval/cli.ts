@@ -1,12 +1,18 @@
 import { readFile, writeFile } from 'node:fs/promises';
-import { formatSummaryTable, parseCliArgs, sameReport, serializeReport } from './cliSupport.js';
-import { loadCorpus, loadEvalSet } from './dataset.js';
+import {
+  formatSummaryTable,
+  parseCliArgs,
+  questionsFileFor,
+  sameReport,
+  serializeReport,
+} from './cliSupport.js';
+import { EVAL_DIR, loadCorpus, loadEvalSet } from './dataset.js';
 import { runRetrievalEval, type EvalReport } from './retrievalEval.js';
 
 function printReport(report: EvalReport): void {
   const { corpus, config, comparison, comparisonAugmented } = report;
   console.log(
-    `Retrieval eval: ${report.evalSet.items} questions over ${corpus.documents} documents ` +
+    `Retrieval eval (${report.evalSet.name}): ${report.evalSet.items} questions over ${corpus.documents} documents ` +
       `(${corpus.chunks} chunks, ${corpus.entities} entities, ${corpus.relations} relations), ` +
       `provider=${config.provider}, topK=${config.topK}\n`,
   );
@@ -39,7 +45,9 @@ async function checkAgainst(path: string, text: string): Promise<boolean> {
 /** Run the evaluation, print it, and optionally write or check results.json. */
 async function main(): Promise<void> {
   const args = parseCliArgs(process.argv.slice(2));
-  const report = await runRetrievalEval(await loadCorpus(), await loadEvalSet());
+  const resultsPath = args.json ?? args.check;
+  const questions = resultsPath ? questionsFileFor(resultsPath) : undefined;
+  const report = await runRetrievalEval(await loadCorpus(), await loadEvalSet(EVAL_DIR, questions));
   const text = serializeReport(report);
   printReport(report);
   if (args.json) await writeFile(args.json, text, 'utf8');

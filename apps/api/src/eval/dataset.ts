@@ -9,6 +9,9 @@ export const EVAL_DIR = fileURLToPath(new URL('../../eval/', import.meta.url));
 export const CORPUS_FILE = 'corpus.json';
 export const QUESTIONS_FILE = 'questions.json';
 export const RESULTS_FILE = 'results.json';
+/** Multi-hop questions written after the graph-augmented fix; reported as their own stratum. */
+export const POSTFIX_QUESTIONS_FILE = 'questions-postfix.json';
+export const POSTFIX_RESULTS_FILE = 'results-postfix.json';
 
 /** A labelled piece of supporting text: a phrase that must appear in a chunk of one document. */
 export const EvidenceSchema = z.object({
@@ -53,7 +56,10 @@ export async function loadCorpus(dir: string = EVAL_DIR): Promise<Corpus> {
   return CorpusSchema.parse(await readJson(join(dir, CORPUS_FILE)));
 }
 
-/** Load and validate the authored question set. */
-export async function loadEvalSet(dir: string = EVAL_DIR): Promise<EvalSet> {
-  return EvalSetSchema.parse(await readJson(join(dir, QUESTIONS_FILE)));
+/** Load and validate an authored question set (the original 20 by default). */
+export async function loadEvalSet(
+  dir: string = EVAL_DIR,
+  file: string = QUESTIONS_FILE,
+): Promise<EvalSet> {
+  return EvalSetSchema.parse(await readJson(join(dir, file)));
 }
