@@ -14,7 +14,7 @@ Ingest documents, watch a knowledge graph assemble on an interactive canvas, the
 
 [Retrieval evaluation](docs/EVAL.md) · [Architecture](docs/ARCHITECTURE.md) · [Why this exists](docs/WHY.md) · [Deployment steps](docs/DEPLOY.md)
 
-There is no hosted demo yet. The app runs locally with no API keys. A read-only public mode and a one-project Vercel deploy (web app plus API as a Vercel Function) are built and were checked locally, but have not been deployed, so no link here points at a running instance.
+**[Live demo (read-only, mock mode)](https://knowledge-graph-rag-explorer.vercel.app)**: the hosted app serves a fixed sample corpus (10 fictional rail documents) with the mock provider, so no model is called, and ingest and reset are turned off. It is deployed as described in [docs/DEPLOY.md](docs/DEPLOY.md). The app also runs locally with no API keys.
 
 ## Why this exists
 

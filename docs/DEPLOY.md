@@ -1,6 +1,6 @@
-# Keyless public deployment (prepared, not executed)
+# Keyless public deployment
 
-Nothing here is deployed yet. This page gives the exact steps to run the app publicly with no API keys and no paid model calls. It uses the mock provider and the read-only demo mode.
+The public demo runs at https://knowledge-graph-rag-explorer.vercel.app (deployed 2026-09-25 with section 1 below). This page gives the exact steps to run the app publicly with no API keys and no paid model calls. It uses the mock provider and the read-only demo mode.
 
 The recommended layout is **one Vercel project** that serves the web app and runs the API as a Vercel Function on the same origin. A Render blueprint is kept as a fallback for the API.
 
@@ -136,4 +136,4 @@ curl -s -N -X POST https://<alias>/api/query -H 'content-type: application/json'
 
 Then open the alias in a browser and click a suggested question. Per-deployment URLs sit behind Vercel login, so share only the production alias. Only after all of this passes should the README or a CV link to the demo, labelled as a live demo on the mock provider.
 
-On 2026-09-24, the guessed alias `https://knowledge-graph-rag-explorer.vercel.app` returned 404: nothing is deployed there.
+On 2026-09-24 the alias `https://knowledge-graph-rag-explorer.vercel.app` returned 404. On 2026-09-25 it was deployed with section 1, and these checks passed on production: title "KG RAG Explorer"; `/api/health` reported `llmProvider: mock`, `documentCount: 10`, `entityCount: 51`, `readOnly: true`; `DELETE /api/corpus` and `POST /api/ingest` returned 403; a query streamed to `done`; in a browser at 390 and 1440 px a suggested question streamed to an answer with no console errors and no horizontal scroll.
