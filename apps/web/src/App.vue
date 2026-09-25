@@ -18,16 +18,19 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="flex h-screen flex-col gap-3 p-3">
+  <div class="flex min-h-screen flex-col gap-3 p-3 lg:h-screen">
     <AppHeader />
 
     <main
-      class="grid min-h-0 flex-1 gap-3"
-      style="grid-template-columns: minmax(280px, 320px) minmax(0, 1fr) minmax(340px, 420px)"
+      class="flex flex-col gap-3 lg:grid lg:min-h-0 lg:flex-1 lg:grid-cols-[minmax(280px,320px)_minmax(0,1fr)_minmax(340px,420px)]"
     >
-      <IngestPanel class="hidden md:flex" />
-      <KnowledgeGraphCanvas />
-      <ChatPanel class="hidden lg:flex" />
+      <IngestPanel class="hidden lg:flex" />
+      <div class="h-[55vh] lg:h-auto lg:min-h-0">
+        <KnowledgeGraphCanvas />
+      </div>
+      <div class="lg:min-h-0">
+        <ChatPanel />
+      </div>
     </main>
   </div>
 </template>
